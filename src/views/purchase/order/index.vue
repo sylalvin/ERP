@@ -91,6 +91,15 @@
           v-hasPermi="['purchase:order:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          plain
+          icon="el-icon-close"
+          size="mini"
+          @click="handleClose"
+        >关闭</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -387,7 +396,7 @@ export default {
         pageNum: 1,
         pageSize: 20
       }).then(response => {
-        console.log(JSON.stringify(response.rows))
+        // console.log(JSON.stringify(response.rows))
       })
     },
     getSupplierListByName(query) { // 通过name得模糊查询
@@ -490,6 +499,24 @@ export default {
         this.title = "修改采购";
       });
     },
+    /** 关闭按钮操作 */
+    handleClose() {
+      this.$store.dispatch('tagsView/delView', this.$route).then(({ visitedViews }) => {
+        this.toLastView(visitedViews, this.$route)
+      })
+    },
+    toLastView(visitedViews, view) {
+      const latestView = visitedViews.slice(-1)[0]
+      if (latestView) {
+        this.$router.push(latestView.fullPath)
+      } else {
+        if (view.name === 'Dashboard') {
+          this.$router.replace({ path: '/redirect' + view.fullPath })
+        } else {
+          this.$router.push('/')
+        }
+      }
+    },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
@@ -538,6 +565,11 @@ export default {
           this.download(response.msg);
           this.exportLoading = false;
         }).catch(() => {});
+    }
+  },
+  computed: {
+    visitedViews() {
+      return this.$store.state.tagsView.visitedViews
     }
   }
 };
