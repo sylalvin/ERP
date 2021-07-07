@@ -120,6 +120,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/purchase',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/purchase/order/detail',
+        component: (resolve) => require(['@/views/purchase/order/detail'], resolve),
+        hidden: true,
+        name: "OrderDetail"
+      }
+    ]
+  },
+  {
     path: '/gen',
     component: Layout,
     hidden: true,

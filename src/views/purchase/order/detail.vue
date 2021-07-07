@@ -1,52 +1,5 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" class="search-form">
-      <el-form-item label="开始日期"  prop="beginDate">
-          <el-date-picker clearable size="small"
-            v-model="queryParams.beginDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择开始日期">
-          </el-date-picker>
-      </el-form-item>
-      <el-form-item label="结束日期" prop="endDate">
-          <el-date-picker clearable size="small"
-            v-model="queryParams.endDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择结束日期">
-          </el-date-picker>
-      </el-form-item>
-      <el-form-item label="单据编号" prop="keyid">
-        <el-input
-          v-model="queryParams.keyid"
-          placeholder="请输入单据编号"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="供应商代码" prop="fcode">
-        <el-select v-model="queryParams.fcode" placeholder="请选择供应商代码" clearable size="small" filterable remote :remote-method="getSupplierListByCode">
-          <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="供应商名称" prop="fname">
-        <el-select v-model="queryParams.fname" placeholder="请选择供应商名称" clearable size="small" filterable remote :remote-method="getSupplierListByName">
-          <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="单据状态" prop="fstatus">
-        <el-select v-model="queryParams.fstatus" placeholder="请选择单据状态" size="small">
-          <el-option v-for="(item, index) in billDictList" :key="index" :label="item.fkey" :value="item.fvalue" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
@@ -64,32 +17,9 @@
           plain
           icon="el-icon-edit"
           size="mini"
-          :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['purchase:order:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['purchase:order:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-		  :loading="exportLoading"
-          @click="handleExport"
-          v-hasPermi="['purchase:order:export']"
-        >导出</el-button>
+        >保存</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -100,10 +30,9 @@
           @click="handleClose"
         >关闭</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table height="100%" v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
+    <el-table height="100%" v-loading="loading" :data="[]" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="单据编号" align="center" prop="keyid" />
       <el-table-column label="配送日期" align="center" prop="fdate" width="180">
@@ -129,17 +58,8 @@
       <el-table-column label="单据状态" align="center" prop="fstatus" />
       <el-table-column label="作业区" align="center" prop="fdistributionpoint" />
     </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
 
-    <!-- 添加或修改采购对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <!-- 添加或修改采购表单 -->
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="单据编号" prop="keyid">
           <el-input v-model="form.keyid" placeholder="请输入单据编号" />
@@ -226,57 +146,25 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listOrder, getOrder, delOrder, addOrder, updateOrder, exportOrder } from "@/api/purchase/order";
+import { getOrder, addOrder, updateOrder } from "@/api/purchase/order";
 import { listSupplier } from "@/api/basic/supplier";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
 
 export default {
-  name: "Order",
-  components: {
-  },
+  name: "OrderDetail",
   data() {
     return {
       // 遮罩层
       loading: true,
-      // 导出遮罩层
-      exportLoading: false,
-      // 选中数组
-      ids: [],
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
-      // 显示搜索条件
-      showSearch: true,
-      // 总条数
-      total: 0,
-      // 采购表格数据
-      orderList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
-      // 查询参数
-      queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-        keyid: null,
-        fcode: null,
-        fname: null,
-        fstatus: null,
-        beginDate: null,
-        endDate: null
-      },
       supplierListNameParams: { // 通过Name查询供应商参数
         pageNum: 1,
         pageSize: 20,
@@ -301,35 +189,28 @@ export default {
       deliveryDictList: [], // 配送方式
       areaDictList: [], // 区域
       businessDictList: [], // 业务类型
-      operationDictList: [] // 操作区
+      operationDictList: [], // 操作区
+      keyid: null
     };
   },
   created() {
+    this.keyid = this.$route.query.keyid
+    if(this.keyid) {
+      this.$route.meta.title = this.title = '编辑采购订单'
+      this.getOrderDetail(this.keyid)
+    }else {
+      this.$route.meta.title = this.title = '添加采购订单'
+    }
     this.getDictList();
   },
   methods: {
-    /** 查询采购列表 */
-    getList() {
-      this.loading = true;
-      listOrder(this.queryParams).then(response => {
-        this.orderList = response.rows;
-        for (let i = 0; i < this.orderList.length; i++) {
-          const element = this.orderList[i];
-          if(element.fflag == 0) {
-            element.fflag = "未启用"
-          }else{
-            element.fflag = "已启用"
-          }
-          for (let j = 0; j < this.billDictList.length; j++) {
-            const element1 = this.billDictList[j];
-            if(element.fstatus == element1.fvalue) {
-              element.fstatus = element1.fkey
-            }
-          }
-        }
-        this.total = response.total;
-        this.loading = false;
-      });
+    /** 监听路由发生变化执行函数 */
+
+    /** 查询采购订单详情 */
+    getOrderDetail(keyid) {
+      getOrder(keyid).then(response => {
+        this.loading = false
+      })
     },
     /** 查询字典，初始化页面数据 */
     getDictList() {
@@ -340,7 +221,7 @@ export default {
         fsparent: 1007
       }).then(response => {
         this.billDictList = response.rows
-        this.getList() // 先获取单据状态，根据单据状态渲染列表
+        // this.getList() // 先获取单据状态，根据单据状态渲染列表
       })
       // 获取配送方式
       listItem({
@@ -452,7 +333,7 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
-      this.getList();
+      // this.getList();
     },
     /** 重置按钮操作 */
     resetQuery() {
@@ -467,29 +348,17 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      this.reset();
       const keyid = row.keyid || this.ids
-      const route = {
-        name: "OrderDetail",
-        path: "/purchase/order/detail",
-        query: {
-          keyid: keyid
-        }
-      }
-      Object.assign(route, {
-        meta: { title: '编辑采购订单' }
-      })
-      this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
+      getOrder(keyid).then(response => {
+        this.form = response.data;
+        this.open = true;
+        this.title = "修改采购";
+      });
     },
     /** 新增按钮操作 */
     handleAdd() {
-      const route = {
-        name: "OrderDetail",
-        path: "/purchase/order/detail"
-      }
-      Object.assign(route, {
-        meta: { title: '添加采购订单' }
-      })
-      this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
+      this.$store.dispatch('tagsView/addView', this.$route)
     },
     /** 关闭按钮操作 */
     handleClose() {
@@ -517,13 +386,13 @@ export default {
             updateOrder(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
-              this.getList();
+              // this.getList();
             });
           } else {
             addOrder(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
-              this.getList();
+              // this.getList();
             });
           }
         }
@@ -539,7 +408,7 @@ export default {
         }).then(function() {
           return delOrder(keyids);
         }).then(() => {
-          this.getList();
+          // this.getList();
           this.msgSuccess("删除成功");
         }).catch(() => {});
     },
@@ -562,6 +431,26 @@ export default {
   computed: {
     visitedViews() {
       return this.$store.state.tagsView.visitedViews
+    }
+  },
+  watch: {
+    $route: {
+      handler: function(val){
+        if(val.path != '/purchase/order/detail') return
+        this.keyid = this.$route.query.keyid
+        if(this.keyid) {
+          this.$route.meta.title = this.title = '编辑采购订单'
+          this.getOrderDetail(this.keyid);
+        }else {
+          this.$route.meta.title = this.title = '添加采购订单'
+        }
+        const visitedViews = this.$store.state.tagsView.visitedViews
+        for(let item of visitedViews) {
+          if(item.path == this.$route.path) {
+            item.title = this.title
+          }
+        }
+      }
     }
   }
 };
