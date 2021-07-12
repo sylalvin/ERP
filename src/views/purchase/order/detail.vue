@@ -1,71 +1,13 @@
 <template>
   <div class="app-container">
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['purchase:order:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          @click="handleUpdate"
-          v-hasPermi="['purchase:order:edit']"
-        >保存</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-close"
-          size="mini"
-          @click="handleClose"
-        >关闭</el-button>
-      </el-col>
-    </el-row>
-
-    <el-table height="100%" v-loading="loading" :data="[]" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="单据编号" align="center" prop="keyid" />
-      <el-table-column label="配送日期" align="center" prop="fdate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.fdate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="供应商代码" align="center" prop="fcode" />
-      <el-table-column label="供应商名称" align="center" prop="fname" />
-      <el-table-column label="车牌号" align="center" prop="fvehiclenum" />
-      <el-table-column label="配送方式" align="center" prop="fdeliverymethod" />
-      <el-table-column label="司机" align="center" prop="fdriver" />
-      <el-table-column label="押运员" align="center" prop="fsupercargo" />
-      <el-table-column label="业务员" align="center" prop="fsalesman" />
-      <el-table-column label="备注" align="center" prop="fmemo" />
-      <el-table-column label="启用标志" align="center" prop="fflag" />
-      <el-table-column label="更新时间" align="center" prop="fupdatedate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.fupdatedate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="发货人" align="center" prop="fshipper" />
-      <el-table-column label="单据状态" align="center" prop="fstatus" />
-      <el-table-column label="作业区" align="center" prop="fdistributionpoint" />
-    </el-table>
-
-    <!-- 添加或修改采购表单 -->
+    <div class="top-form">
+      <!-- 添加或修改采购表单 -->
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="单据编号" prop="keyid">
-          <el-input v-model="form.keyid" placeholder="请输入单据编号" />
+          <el-input v-model="form.keyid" disabled />
         </el-form-item>
         <el-form-item label="配送日期" prop="fdate">
-          <el-date-picker clearable size="small"
+          <el-date-picker clearable
             v-model="form.fdate"
             type="date"
             value-format="yyyy-MM-dd"
@@ -73,12 +15,12 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="供应商代码" prop="fcode">
-          <el-select v-model="form.fcode" placeholder="请选择供应商代码" clearable size="small" filterable remote :remote-method="getSupplierListByCode">
+          <el-select v-model="form.fcode" placeholder="请选择供应商代码" clearable filterable remote :remote-method="getSupplierListByCode">
             <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
           </el-select>
         </el-form-item>
         <el-form-item label="供应商名称" prop="fname">
-          <el-select v-model="form.fname" placeholder="请选择供应商名称" clearable size="small" filterable remote :remote-method="getSupplierListByName">
+          <el-select v-model="form.fname" placeholder="请选择供应商名称" clearable filterable remote :remote-method="getSupplierListByName">
           <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
           </el-select>
         </el-form-item>
@@ -146,6 +88,98 @@
           </el-select>
         </el-form-item>
       </el-form>
+    </div>
+    <div class="middle-form">
+      <el-row :gutter="10">
+        <el-col :span="1.5">
+          <el-button
+            type="primary"
+            plain
+            icon="el-icon-plus"
+            size="mini"
+            :disabled="form.fname ? false : true"
+            @click="handleAdd"
+            v-hasPermi="['purchase:order:add']"
+          >新增</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="success"
+            plain
+            icon="el-icon-edit"
+            size="mini"
+            @click="handleUpdate"
+            v-hasPermi="['purchase:order:edit']"
+          >保存</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="info"
+            plain
+            icon="el-icon-close"
+            size="mini"
+            @click="handleClose"
+          >关闭</el-button>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="bottom-form">
+      <el-table
+        :data="form.yqPurchaseOrderDetailList"
+        stripe
+        style="width: 100%"
+        height="100%">
+        <el-table-column label="删除" fixed width="100" align="center">
+          <template v-slot="scope">
+            <el-button
+              type="text"
+              icon="el-icon-remove"
+              @click="handleDelete(scope.$index, form.yqPurchaseOrderDetailList)"
+            ></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fitemcode"
+          label="编码">
+        </el-table-column>
+        <el-table-column
+          prop="fbottle"
+          label="品名">
+        </el-table-column>
+        <el-table-column
+          prop="fbspec"
+          label="规格">
+        </el-table-column>
+        <el-table-column
+          prop="fcateid"
+          label="单位">
+        </el-table-column>
+        <el-table-column
+          prop="fprice"
+          label="单价">
+        </el-table-column>
+        <el-table-column
+          prop="fqty"
+          label="数量">
+        </el-table-column>
+        <el-table-column
+          prop="famount"
+          label="金额">
+        </el-table-column>
+        <el-table-column
+          prop="remark"
+          label="备注说明">
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <!-- 添加或修改采购对话框 -->
+    <el-dialog :visible.sync="open" width="500px" append-to-body>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -154,6 +188,7 @@ import { getOrder, addOrder, updateOrder } from "@/api/purchase/order";
 import { listSupplier } from "@/api/basic/supplier";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
+import { getBill } from "@/api/system/bill";
 
 export default {
   name: "OrderDetail",
@@ -175,6 +210,7 @@ export default {
         pageSize: 20,
         fcode: null
       },
+      productTemp: {}, // 所选商品临时信息
       // 表单参数
       form: {},
       // 表单校验
@@ -200,15 +236,27 @@ export default {
       this.getOrderDetail(this.keyid)
     }else {
       this.$route.meta.title = this.title = '添加采购订单'
+      this.getBillNumber();
     }
     this.getDictList();
   },
   methods: {
-    /** 监听路由发生变化执行函数 */
-
+    /** 获取单据号 */
+    getBillNumber() {
+      getBill({
+        prefix: 'TM'
+      }).then(response => {
+        this.reset()
+        this.form.keyid = response.data
+      })
+    },
     /** 查询采购订单详情 */
     getOrderDetail(keyid) {
       getOrder(keyid).then(response => {
+        this.loading = false
+        this.reset()
+        Object.assign(this.form, response.data)
+      }, error => {
         this.loading = false
       })
     },
@@ -326,25 +374,10 @@ export default {
         forgid: null,
         forgname: null,
         fbill: null,
-        fpoint: null
+        fpoint: null,
+        yqPurchaseOrderDetailList: []
       };
       this.resetForm("form");
-    },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
-      // this.getList();
-    },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
-    },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.keyid)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -358,7 +391,8 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.$store.dispatch('tagsView/addView', this.$route)
+      console.log("--------------------------")
+      this.open = true
     },
     /** 关闭按钮操作 */
     handleClose() {
@@ -380,53 +414,37 @@ export default {
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.keyid != null) {
-            updateOrder(this.form).then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              // this.getList();
-            });
-          } else {
-            addOrder(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              // this.getList();
-            });
-          }
-        }
-      });
+      this.open = false
+      // this.$refs["form"].validate(valid => {
+      //   if (valid) {
+      //     if (this.form.keyid != null) {
+      //       updateOrder(this.form).then(response => {
+      //         this.msgSuccess("保存成功");
+      //         this.open = false;
+      //         // this.getList();
+      //       });
+      //     } else {
+      //       addOrder(this.form).then(response => {
+      //         this.msgSuccess("新增成功");
+      //         this.open = false;
+      //         // this.getList();
+      //       });
+      //     }
+      //   }
+      // });
     },
     /** 删除按钮操作 */
-    handleDelete(row) {
-      const keyids = row.keyid || this.ids;
-      this.$confirm('是否确认删除采购编号为"' + keyids + '"的数据项?', "警告", {
+    // handleDelete(row) {
+    handleDelete(index, rows) {
+      console.log(JSON.stringify(index))
+      this.$confirm('是否确认删除商品编码为"' + rows[index].FItemCode + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delOrder(keyids);
-        }).then(() => {
-          // this.getList();
-          this.msgSuccess("删除成功");
-        }).catch(() => {});
+          rows.splice(index,1)
+        }).catch(() => {})
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有采购数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.exportLoading = true;
-          return exportOrder(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-          this.exportLoading = false;
-        }).catch(() => {});
-    }
   },
   computed: {
     visitedViews() {
@@ -443,6 +461,7 @@ export default {
           this.getOrderDetail(this.keyid);
         }else {
           this.$route.meta.title = this.title = '添加采购订单'
+          this.getBillNumber();
         }
         const visitedViews = this.$store.state.tagsView.visitedViews
         for(let item of visitedViews) {
@@ -469,7 +488,26 @@ export default {
   .el-form >>> .el-form-item__content {
     margin-left: 100px !important;
   }
-  .search-form >>> .el-form-item__content{
-    margin-left: 10px !important;
+  .el-form-item {
+    margin-bottom: 22px;
+    width: 25%;
+    display: inline-block;
+  }
+  .middle-form {
+    padding: 10px;
+    background-color: #dfeaf2;
+  }
+  .bottom-form {
+    flex: 1;
+    overflow: auto;
+  }
+  .cell > .el-button--text {
+    color: #ff5722;
+  }
+  .cell > .el-button--medium, .deleteBtn >>> .el-button--mini {
+    font-size: 24px;
+  }
+  .el-date-editor.el-input, .el-date-editor.el-input__inner {
+    width: 100%;
   }
 </style>

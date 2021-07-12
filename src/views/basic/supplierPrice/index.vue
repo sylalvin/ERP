@@ -6,7 +6,6 @@
           v-model="queryParams.companyName"
           placeholder="请输入供应商名称"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -15,7 +14,6 @@
           v-model="queryParams.productName"
           placeholder="请输入商品名称"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -98,8 +96,8 @@
         />
       </el-form-item> -->
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">查询</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

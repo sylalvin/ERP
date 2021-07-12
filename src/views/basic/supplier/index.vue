@@ -6,7 +6,6 @@
           v-model="queryParams.fcode"
           placeholder="请输入客户代码"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -15,7 +14,6 @@
           v-model="queryParams.fname"
           placeholder="请输入客户名称"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -24,14 +22,13 @@
           v-model="queryParams.fspell"
           placeholder="请输入助记码"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleQuery">查询</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -92,8 +89,8 @@
         </el-collapse>
       </div>
       <div class="container-right">
-        <el-table height="100%" v-loading="loading" :data="supplierList" @selection-change="handleSelectionChange" class="table">
-          <el-table-column type="selection" width="55" align="center" />
+        <el-table height="100%" v-loading="loading" :data="supplierList" @selection-change="handleSelectionChange" class="table" fit>
+          <el-table-column type="selection" align="center" />
           <el-table-column label="供应商代码" align="center" prop="fcode" />
           <el-table-column label="客户名称" align="center" prop="fname" />
           <el-table-column label="助记码" align="center" prop="fspell" />
