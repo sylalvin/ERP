@@ -243,7 +243,7 @@ export default {
     getCategoryList() {
       getDictListItem({
         pageNum: 1,
-        pageSize: 20,
+        pageSize: 100,
         fsparent: 1003
       }).then(response => {
         this.menuList = response.rows

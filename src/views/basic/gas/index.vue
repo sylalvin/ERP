@@ -67,50 +67,46 @@
           v-hasPermi="['basic:gas:export']"
         >导出</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList(queryParams.fsubcateid, activeWhich)"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="gasList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="商品代码" align="center" prop="fcode" />
-      <el-table-column label="商品名称" align="center" prop="fname" />
-      <el-table-column label="助记码" align="center" prop="fspell" />
-      <el-table-column label="规格" align="center" prop="fspec" />
-      <el-table-column label="单位" align="center" prop="funit" />
-      <el-table-column label="分类" align="center" prop="fcateid" />
-      <el-table-column label="子分类" align="center" prop="fsubcateid" />
-      <el-table-column label="是否启用，1启用0禁用" align="center" prop="fflag" />
-      <el-table-column label="子分类名称" align="center" prop="fsubcatename" />
-      <el-table-column label="用友存货码" align="center" prop="finum" />
-      <el-table-column label="包装物" align="center" prop="fbottlecode" />
-      <el-table-column label="库位货架" align="center" prop="frack" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['basic:gas:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['basic:gas:remove']"
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <div class="d-flex">
+      <div class="container-left">
+        <el-collapse v-model="activeNames" class="collapse" v-if="menuList.length > 0">
+          <el-collapse-item  class="collapse-item" :title="menuList[0].fid + ' - ' + menuList[0].fname" name="1" @click.native="handleCategoryClick" :class="{activeStyle: activeWhich == -1}">
+            <ul>
+              <li v-for="(item,index) in menuForList" :key="index" class="el-icon-document" @click.stop="getList(item.fid, index)" :class="{activeStyle: activeWhich == index}">{{ item.fid }} - {{ item.fvalue }}</li>
+            </ul>
+          </el-collapse-item> 
+        </el-collapse>
+      </div>
+      <div class="container-right">
+        <el-table height="100%" v-loading="loading" :data="gasList" @selection-change="handleSelectionChange" class="table" fit>
+          <el-table-column type="selection" width="55" align="center" />
+          <el-table-column label="商品代码" align="center" prop="fcode" />
+          <el-table-column label="商品名称" align="center" prop="fname" />
+          <el-table-column label="助记码" align="center" prop="fspell" />
+          <el-table-column label="规格" align="center" prop="fspec" />
+          <el-table-column label="单位" align="center" prop="funit" />
+          <el-table-column label="分类" align="center" prop="fcateid" />
+          <el-table-column label="子分类" align="center" prop="fsubcateid" />
+          <el-table-column label="是否启用，1启用0禁用" align="center" prop="fflag" />
+          <el-table-column label="子分类名称" align="center" prop="fsubcatename" />
+          <el-table-column label="用友存货码" align="center" prop="finum" />
+          <el-table-column label="包装物" align="center" prop="fbottlecode" />
+          <el-table-column label="库位货架" align="center" prop="frack" />
+        </el-table>
+        
+        <pagination
+          class="y-pagination"
+          v-show="total>0"
+          :total="total"
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getList(queryParams.fsubcateid, activeWhich)"
+        />
+      </div>
+    </div>
 
     <!-- 添加或修改气体档案对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -178,6 +174,8 @@
 
 <script>
 import { listGas, getGas, delGas, addGas, updateGas, exportGas } from "@/api/basic/gas";
+import { listDict as getDictList} from "@/api/system/businessDict";
+import { listItem as getDictListItem} from "@/api/system/businessDictItem";
 
 export default {
   name: "Gas",
@@ -211,6 +209,7 @@ export default {
         pageSize: 10,
         fcode: null,
         fname: null,
+        fsubcateid: null
       },
       // 表单参数
       form: {},
@@ -228,21 +227,75 @@ export default {
         fsalesprice: [
           { required: true, message: "销售价不能为空", trigger: "blur" }
         ],
-      }
+      },
+      activeNames: ['1'],
+      activeWhich: -1,
+      menuList: [],
+      menuForList: []
     };
   },
   created() {
-    this.getList();
+    this.getDict();
   },
   methods: {
     /** 查询气体档案列表 */
-    getList() {
+    getList(fid = null, index = -1) {
       this.loading = true;
+      this.queryParams.fsubcateid = fid
+      this.activeWhich = index
       listGas(this.queryParams).then(response => {
         this.gasList = response.rows;
+        for (const key in this.gasList) {
+          if (Object.hasOwnProperty.call(this.gasList, key)) {
+            const element = this.gasList[key];
+            if(element.fflag == 1) {
+              element.fflag = '启用'
+            }else {
+              element.fflag = '未启用'
+            }
+          }
+        }
         this.total = response.total;
         this.loading = false;
       });
+    },
+    /** 查询业务字典分类列表 */
+    getDict() {
+      getDictList({
+        pageNum: 1,
+        pageSize: 100,
+        fname: null
+      }).then(res => {
+        this.menuList = []
+        for (const value of res.rows) {
+          if(value.fid == '2000') {
+            this.menuList.push(value)
+            this.getCategoryList()
+            return
+          }
+        }
+      })
+    },
+    /** 查询气体档案分类列表 */
+    getCategoryList() {
+      getDictListItem({
+        pageNum: 1,
+        pageSize: 100,
+        fsparent: 2000
+      }).then(response => {
+        this.menuForList = []
+        for(let i = 0; i < response.rows.length; i++) {
+          this.menuForList.push(response.rows[i])
+        }
+        this.getList(null, this.activeWhich)
+      })
+    },
+    handleCategoryClick() {
+      if(this.activeWhich == -1) {
+        return
+      }
+      this.activeWhich = -1
+      this.getList(null, this.activeWhich)
     },
     // 取消按钮
     cancel() {
@@ -280,7 +333,7 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
-      this.getList();
+      this.getList(this.queryParams.fsubcateid, this.activeWhich);
     },
     /** 重置按钮操作 */
     resetQuery() {
@@ -317,13 +370,13 @@ export default {
             updateGas(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
-              this.getList();
+              this.getList(this.queryParams.fsubcateid, this.activeWhich);
             });
           } else {
             addGas(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
-              this.getList();
+              this.getList(this.queryParams.fsubcateid, this.activeWhich);
             });
           }
         }
@@ -361,3 +414,76 @@ export default {
   }
 };
 </script>
+<style scoped>
+  .app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+  .d-flex {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: auto;
+  }
+  .d-none {
+    display: none;
+  }
+  ul {
+    margin: 0;
+    padding: 5px;
+    list-style: none;
+  }
+  .container-left {
+    width: 200px;
+    overflow: scroll !important;
+    border: #ccc 1px solid;
+    padding: 5px;
+  }
+  .container-left li {
+    margin-bottom: 10px;
+    font-size: 16px;
+    white-space: nowrap;
+    padding-right: 10px;
+  }
+  .container-left li:hover {
+    color: #1d8cff;
+  }
+  .container-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  .table {
+    flex: 1;
+  }
+  .y-pagination {
+    height: 50px;
+    border: 1px solid #ccc;
+  }
+  .pagination-container {
+    margin: 0;
+  }
+  .el-icon-document {
+    display: inline-flex
+  }
+  .activeStyle {
+    color: #1d8cff;
+  }
+  .collapse, .collapse >>> .el-collapse-item__header, .collapse >>> .el-collapse-item__wrap {
+    border: none !important;
+  }
+  .collapse >>> .el-collapse-item__header {
+    padding-left: 5px;
+    font-size: 16px;
+  }
+  .activeStyle >>> .el-collapse-item__header {
+    color: #1d8cff;
+  }
+  .collapse-item >>> .el-collapse-item__wrap {
+    overflow: unset;
+  }
+</style>
