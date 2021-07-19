@@ -174,8 +174,9 @@
     </div>
 
     <!-- 添加或修改采购对话框 -->
-    <el-dialog :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :visible.sync="open" width="80%">
       <div slot="footer" class="dialog-footer">
+        <popup title="商品档案" :mdata="dataList"/>
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
@@ -189,11 +190,22 @@ import { listSupplier } from "@/api/basic/supplier";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
 import { getBill } from "@/api/system/bill";
+import Popup from "@/components/Popup";
 
 export default {
   name: "OrderDetail",
   data() {
     return {
+      dataList: [
+        {
+          id: 1,
+          name: "111"
+        },
+        {
+          id: 2,
+          name: "222"
+        }
+      ],
       // 遮罩层
       loading: true,
       // 弹出层标题
@@ -391,7 +403,6 @@ export default {
     },
     /** 新增按钮操作 */
     handleAdd() {
-      console.log("--------------------------")
       this.open = true
     },
     /** 关闭按钮操作 */
@@ -471,6 +482,9 @@ export default {
         }
       }
     }
+  },
+  components: {
+    Popup
   }
 };
 </script>

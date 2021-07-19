@@ -287,6 +287,7 @@ export default {
         pageSize: 100,
         fname: null
       }).then(res => {
+        console.log("wuyifan====================" + JSON.stringify(res))
         this.menuList = []
         for (const value of res.rows) {
           if(value.fid == '2001') {
