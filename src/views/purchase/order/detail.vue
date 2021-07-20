@@ -174,12 +174,12 @@
     </div>
 
     <!-- 添加或修改采购对话框 -->
-    <el-dialog :visible.sync="open" width="80%">
-      <div slot="footer" class="dialog-footer">
-        <popup title="商品档案" :mdata="dataList"/>
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+    <el-dialog :visible.sync="open" title="商品档案">
+      <div slot="title" class="dialog-title">
+        <i class="el-icon-menu"></i>
+        商品档案
       </div>
+      <popup :mdata="dataList" @close="handleCloseEvent"/>
     </el-dialog>
   </div>
 </template>
@@ -456,6 +456,10 @@ export default {
           rows.splice(index,1)
         }).catch(() => {})
     },
+    handleCloseEvent() {
+      console.log('close')
+      this.open = false
+    }
   },
   computed: {
     visitedViews() {
@@ -523,5 +527,25 @@ export default {
   }
   .el-date-editor.el-input, .el-date-editor.el-input__inner {
     width: 100%;
+  }
+  ::v-deep .el-dialog {
+    width: 80%;
+    background: #3892d3;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  ::v-deep .el-dialog__title, ::v-deep .el-dialog__close {
+    color: #fff;
+  }
+  ::v-deep .dialog-title {
+    color: #fff;
+  }
+  ::v-deep .el-dialog__body {
+    padding: 10px;
+    height: calc(100% - 55px);
+  }
+  ::v-deep .el-dialog__headerbtn:focus .el-dialog__close, ::v-deep .el-dialog__headerbtn:hover .el-dialog__close {
+    color: #f00 !important;
   }
 </style>
