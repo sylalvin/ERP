@@ -179,7 +179,7 @@
         <i class="el-icon-menu"></i>
         商品档案
       </div>
-      <popup :mdata="dataList" @close="handleCloseEvent"/>
+      <popup :product-list="dataList" @close="handleCloseEvent"/>
     </el-dialog>
   </div>
 </template>
@@ -187,6 +187,7 @@
 <script>
 import { getOrder, addOrder, updateOrder } from "@/api/purchase/order";
 import { listSupplier } from "@/api/basic/supplier";
+import { listDict } from "@/api/system/businessDict";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
 import { getBill } from "@/api/system/bill";
@@ -196,16 +197,7 @@ export default {
   name: "OrderDetail",
   data() {
     return {
-      dataList: [
-        {
-          id: 1,
-          name: "111"
-        },
-        {
-          id: 2,
-          name: "222"
-        }
-      ],
+      dataList: [],
       // 遮罩层
       loading: true,
       // 弹出层标题
@@ -251,6 +243,7 @@ export default {
       this.getBillNumber();
     }
     this.getDictList();
+    this.getProduct(); // 获取产品数据对象
   },
   methods: {
     /** 获取单据号 */
@@ -459,6 +452,31 @@ export default {
     handleCloseEvent() {
       console.log('close')
       this.open = false
+    },
+    getProduct() {
+      listDict({
+        pageNum: 1,
+        pageSize: 100
+      }).then(response => {
+        // console.log(JSON.stringify(response))
+        this.dataList[0] = response.rows.filter(item => {
+          return item.fid == '2000' || item.fid == '2001' || item.fid == '2002'
+        })
+        console.log(JSON.stringify(this.dataList))
+        // let flag = false
+        for(let value of this.dataList[0]) {
+          listItem({
+            pageNum: 1,
+            pageSize: 100,
+            fsparent: value.fid
+          }).then(response => {
+            value.childList = response.rows
+            if(this.dataList[0][this.dataList[0].length-1] == value) {
+              console.log(JSON.stringify(this.dataList))
+            }
+          })
+        }
+      })
     }
   },
   computed: {

@@ -71,14 +71,15 @@ export default {
     //   require: true,
     //   default: "标题"
     // },
-    mdata: {
+    productList: {
       type: Array,
       require: true
     }
   },
   data() {
     return {
-      sdata: this.mdata.filter(v => {
+      sdata: this.productList.filter(v => {
+        console.log("================================")
         console.log(JSON.stringify(v))
         return v.id == 1
       })
