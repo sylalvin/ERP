@@ -440,7 +440,7 @@ export default {
     /** 删除按钮操作 */
     // handleDelete(row) {
     handleDelete(index, rows) {
-      console.log(JSON.stringify(index))
+      // console.log(JSON.stringify(index))
       this.$confirm('是否确认删除商品编码为"' + rows[index].FItemCode + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -458,21 +458,20 @@ export default {
         pageNum: 1,
         pageSize: 100
       }).then(response => {
-        // console.log(JSON.stringify(response))
-        this.dataList[0] = response.rows.filter(item => {
+        this.dataList[0] = {}
+        this.dataList[0].key = '产品分类'
+        this.dataList[0].value = response.rows.filter(item => {
           return item.fid == '2000' || item.fid == '2001' || item.fid == '2002'
         })
-        console.log(JSON.stringify(this.dataList))
-        // let flag = false
-        for(let value of this.dataList[0]) {
+        for(let value of this.dataList[0].value) {
           listItem({
             pageNum: 1,
             pageSize: 100,
             fsparent: value.fid
           }).then(response => {
             value.childList = response.rows
-            if(this.dataList[0][this.dataList[0].length-1] == value) {
-              console.log(JSON.stringify(this.dataList))
+            if(this.dataList[0].value[this.dataList[0].value.length-1] == value) {
+              // console.log(JSON.stringify(this.dataList))
             }
           })
         }
