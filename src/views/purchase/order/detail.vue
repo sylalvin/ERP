@@ -460,6 +460,7 @@ export default {
       }).then(response => {
         this.dataList[0] = {}
         this.dataList[0].key = '产品分类'
+        this.dataList[0].fid = '0000'
         this.dataList[0].value = response.rows.filter(item => {
           return item.fid == '2000' || item.fid == '2001' || item.fid == '2002'
         })

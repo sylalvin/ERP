@@ -7,13 +7,24 @@
     </el-header>
     <el-container class="inside">
         <el-aside>
-          <el-menu :default-openeds="['1']" class="m-menu">
+          <!-- <el-menu :default-openeds="['1']" class="m-menu">
             <el-submenu v-for="(item, index) in productList" :key="index" :index="String(index + 1)">
-              <template slot="title"><span class="w-600" :class="{'activeStyle': activeWhich == index}" @click.stop="handleClick(index)">{{item.key}}</span></template>
+              <template slot="title"><span class="w-600" :class="index == activeWhich?'activeStyle':''" @click.stop="handleClick(index)">{{item.key}}</span></template>
               <el-submenu v-for="(subitem, subindex) in item.value" :key="subindex" :index="(index + 1) + '-' + (subindex + 1)">
-                <template slot="title"><span class="w-500" :class="{'activeStyle': activeWhich == (index + '-' + subindex)}" @click.stop="handleClick(index+'-'+subindex)">{{subitem.fid}}-{{subitem.fname}}</span></template>
+                <template slot="title"><span class="w-500" @click.stop="handleClick(index+'-'+subindex)">{{subitem.fid}}-{{subitem.fname}}</span></template>
                 <el-menu-item v-for="(ssubitem, ssubindex) in subitem.childList" :key="ssubindex" :index="(index + 1) + '-' + (subindex + 1) + '-' + (ssubindex + 1)">
-                  <template slot="title"><span :class="{'activeStyle': activeWhich == (index + '-' + subindex + '-' + ssubindex)}" @click.stop="handleClick(index+'-'+subindex+'-'+ssubindex)">{{ssubitem.fid}}-{{ssubitem.fvalue}}</span></template>
+                  <template slot="title"><span @click.stop="handleClick(index+'-'+subindex+'-'+ssubindex)">{{ssubitem.fid}}-{{ssubitem.fvalue}}</span></template>
+                </el-menu-item>
+              </el-submenu>
+            </el-submenu>
+          </el-menu> -->
+          <el-menu :default-openeds="idsArr" class="m-menu">
+            <el-submenu v-for="item in productList" :key="item.fid" :index="item.fid">
+              <template slot="title"><span class="w-600" :class="{activeStyle: ids[item.fid]}" @click.stop="handleClick(item.fid)">{{item.key}}</span></template>
+              <el-submenu v-for="subitem in item.value" :key="subitem.fid" :index="subitem.fid">
+                <template slot="title"><span class="w-500" :class="{activeStyle: ids[subitem.fid]}" @click.stop="handleClick(subitem.fid)">{{subitem.fid}}-{{subitem.fname}}</span></template>
+                <el-menu-item v-for="ssubitem in subitem.childList" :key="ssubitem.fid" :index="ssubitem.fid">
+                  <template slot="title"><span :class="{activeStyle: ids[ssubitem.fid]}" @click.stop="handleClick(ssubitem.fid)">{{ssubitem.fid}}-{{ssubitem.fvalue}}</span></template>
                 </el-menu-item>
               </el-submenu>
             </el-submenu>
@@ -36,13 +47,41 @@ export default {
     productList: {
       type: Array,
       require: true
-    }
+    },
   },
   data() {
     return {
       queryParams: {},
-      activeWhich: ''
+      ids: {},
+      idsArr: []
     }
+  },
+  created() {
+    let ids = {}
+    if(this.productList.length > 0) {
+      for(let i = 0; i < this.productList.length; i++) {
+        ids[this.productList[i].fid] = true
+        if(this.productList[i].value.length > 0) {
+          for(let j = 0; j < this.productList[i].value.length; j++) {
+            ids[this.productList[i].value[j].fid] = false
+            if(this.productList[i].value[j].childList.length > 0) {
+              for(let k = 0; k < this.productList[i].value[j].childList.length; k++) {
+                ids[this.productList[i].value[j].childList[k].fid] = false
+              }
+            }
+          }
+        }
+      }
+    }
+    console.log(ids)
+    let idsArr = []
+    for(let v in ids) {
+      idsArr.push(v)
+    }
+    this.$set(this.$data, 'ids', ids)
+    this.$set(this.$data, 'idsArr', idsArr)
+    console.log(JSON.stringify(this.ids))
+    console.log(JSON.stringify(this.idsArr))
   },
   methods: {
       handleClose() {
@@ -55,18 +94,18 @@ export default {
         this.$emit('confirm')
       },
       handleClick(val) {
-        console.log(val)
-        this.activeWhich = val
+        for(let x in this.ids) {
+          if(val == x) {
+            this.ids[x] = true
+          }else {
+            this.ids[x] = false
+          }
+        }
+        console.log(JSON.stringify(this.ids));
       }
   },
   watch: {
-    mdata() {
-      console.log("3333333333333333333")
-      this.sdata = this.mdata.some(v => {
-        // console.log(JSON.stringify(v))
-        return v.id == 1
-      })
-    }
+
   }
 }
 </script>
