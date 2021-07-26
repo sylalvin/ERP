@@ -179,7 +179,7 @@
         <i class="el-icon-menu"></i>
         商品档案
       </div>
-      <popup :product-list="dataList" @close="handleCloseEvent"/>
+      <popup :category-list="dataList" @close="handleCloseEvent"/>
     </el-dialog>
   </div>
 </template>
