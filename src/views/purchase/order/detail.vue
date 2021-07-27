@@ -257,6 +257,7 @@ export default {
         pageSize: 20,
         fcode: null
       },
+      productListParams: {}, // 查询商品参数
       productTemp: {}, // 所选商品临时信息
       // 表单参数
       form: {},
@@ -498,6 +499,7 @@ export default {
     handleSearchEvent(queryParams) {
       this.popupLoading = true
       queryParams.fcode = this.form.fcode
+      this.productListParams = queryParams
       console.log('search========' + JSON.stringify(queryParams))
       // 根据条件查询商品
       listPrice(
@@ -506,7 +508,8 @@ export default {
         // 数据处理
         this.popupLoading = false
         console.log(JSON.stringify(response))
-        // this.requestData
+        this.requestData.total = response.total
+        this.requestData.rows = response.rows
       })
     },
     handleConfirmEvent() {
@@ -570,6 +573,12 @@ export default {
           }
         }
       }
+    },
+    'form.fcode': function(newVal, oldVal) {
+      if((newVal != null) && (newVal != oldVal)) {
+          this.productListParams.fcode = newVal
+          this.handleSearchEvent(this.productListParams)
+        }
     }
   },
   components: {
