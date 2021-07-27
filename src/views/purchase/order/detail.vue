@@ -143,32 +143,69 @@
           label="编码">
         </el-table-column>
         <el-table-column
-          prop="fbottle"
+          prop="fitemname"
           label="品名">
         </el-table-column>
         <el-table-column
-          prop="fbspec"
+          prop="fspec"
           label="规格">
         </el-table-column>
         <el-table-column
-          prop="fcateid"
+          prop="funit"
           label="单位">
         </el-table-column>
         <el-table-column
           prop="fprice"
           label="单价">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fprice')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fprice')"
+              @blur="handleBlur"
+              v-model="scope.row.fprice" />
+          </template>
         </el-table-column>
         <el-table-column
           prop="fqty"
           label="数量">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fqty')"
+              @blur="handleBlur"
+              v-model="scope.row.fqty" />
+          </template>
         </el-table-column>
         <el-table-column
           prop="famount"
           label="金额">
+          <template v-slot="scope">
+            <el-input
+              disabled
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'famount')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'famount')"
+              @blur="handleBlur"
+              v-model="scope.row.famount" />
+          </template>
         </el-table-column>
         <el-table-column
           prop="remark"
           label="备注说明">
+          <template v-slot="scope">
+            <el-input
+              type="text"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'remark')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'remark')"
+              @blur="handleBlur"
+              v-model="scope.row.remark" />
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -179,7 +216,7 @@
         <i class="el-icon-menu"></i>
         商品档案
       </div>
-      <popup :category-list="dataList" @close="handleCloseEvent"/>
+      <popup :category-list="categoryList" :request-data="requestData" :loading="popupLoading" @close="handleCloseEvent" @search="handleSearchEvent" @confirm="handleConfirmEvent"/>
     </el-dialog>
   </div>
 </template>
@@ -191,15 +228,21 @@ import { listDict } from "@/api/system/businessDict";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
 import { getBill } from "@/api/system/bill";
+import { listPrice, getPrice, delPrice, addPrice, updatePrice, exportPrice } from "@/api/basic/supplierPrice";
 import Popup from "@/components/Popup";
 
 export default {
   name: "OrderDetail",
   data() {
     return {
-      dataList: [],
+      categoryList: [],
+      requestData: {
+        rows: [],
+        total: 0
+      },
       // 遮罩层
       loading: true,
+      popupLoading: false,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -230,8 +273,9 @@ export default {
       areaDictList: [], // 区域
       businessDictList: [], // 业务类型
       operationDictList: [], // 操作区
-      keyid: null
-    };
+      keyid: null,
+      activeText: ''
+    }
   },
   created() {
     this.keyid = this.$route.query.keyid
@@ -243,7 +287,7 @@ export default {
       this.getBillNumber();
     }
     this.getDictList();
-    this.getProduct(); // 获取产品数据对象
+    this.getCategory(); // 获取产品数据对象
   },
   methods: {
     /** 获取单据号 */
@@ -438,10 +482,8 @@ export default {
       // });
     },
     /** 删除按钮操作 */
-    // handleDelete(row) {
     handleDelete(index, rows) {
-      // console.log(JSON.stringify(index))
-      this.$confirm('是否确认删除商品编码为"' + rows[index].FItemCode + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除商品："' + rows[index].fitemname, "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -453,30 +495,55 @@ export default {
       console.log('close')
       this.open = false
     },
-    getProduct() {
+    handleSearchEvent(queryParams) {
+      this.popupLoading = true
+      queryParams.fcode = this.form.fcode
+      console.log('search========' + JSON.stringify(queryParams))
+      // 根据条件查询商品
+      listPrice(
+        queryParams
+      ).then(response => {
+        // 数据处理
+        this.popupLoading = false
+        console.log(JSON.stringify(response))
+        // this.requestData
+      })
+    },
+    handleConfirmEvent() {
+      // 选择完成后，新增到产品列表
+      console.log('confirm')
+      this.open = false
+    },
+    getCategory() {
       listDict({
         pageNum: 1,
         pageSize: 100
       }).then(response => {
-        this.dataList[0] = {}
-        this.dataList[0].key = '产品分类'
-        this.dataList[0].fid = '0000'
-        this.dataList[0].value = response.rows.filter(item => {
+        this.categoryList[0] = {}
+        this.categoryList[0].key = '产品分类'
+        this.categoryList[0].fid = '0000'
+        this.categoryList[0].value = response.rows.filter(item => {
           return item.fid == '2000' || item.fid == '2001' || item.fid == '2002'
         })
-        for(let value of this.dataList[0].value) {
+        for(let value of this.categoryList[0].value) {
           listItem({
             pageNum: 1,
             pageSize: 100,
             fsparent: value.fid
           }).then(response => {
             value.childList = response.rows
-            if(this.dataList[0].value[this.dataList[0].value.length-1] == value) {
-              // console.log(JSON.stringify(this.dataList))
+            if(this.categoryList[0].value[this.categoryList[0].value.length-1] == value) {
+              // console.log(JSON.stringify(this.categoryList))
             }
           })
         }
       })
+    },
+    handleFocus(text) {
+      this.activeText = text
+    },
+    handleBlur() {
+      this.activeText = ''
     }
   },
   computed: {
@@ -565,5 +632,13 @@ export default {
   }
   ::v-deep .el-dialog__headerbtn:focus .el-dialog__close, ::v-deep .el-dialog__headerbtn:hover .el-dialog__close {
     color: #f00 !important;
+  }
+  ::v-deep .product .el-input__inner {
+    border: none;
+    background: none;
+  }
+  .activeBorder {
+    border: #ff5722 solid 0.5px;
+    border-radius: 5%;
   }
 </style>

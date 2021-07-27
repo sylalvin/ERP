@@ -7,17 +7,6 @@
     </el-header>
     <el-container class="inside">
         <el-aside>
-          <!-- <el-menu :default-openeds="['1']" class="m-menu">
-            <el-submenu v-for="(item, index) in productList" :key="index" :index="String(index + 1)">
-              <template slot="title"><span class="w-600" :class="index == activeWhich?'activeStyle':''" @click.stop="handleClick(index)">{{item.key}}</span></template>
-              <el-submenu v-for="(subitem, subindex) in item.value" :key="subindex" :index="(index + 1) + '-' + (subindex + 1)">
-                <template slot="title"><span class="w-500" @click.stop="handleClick(index+'-'+subindex)">{{subitem.fid}}-{{subitem.fname}}</span></template>
-                <el-menu-item v-for="(ssubitem, ssubindex) in subitem.childList" :key="ssubindex" :index="(index + 1) + '-' + (subindex + 1) + '-' + (ssubindex + 1)">
-                  <template slot="title"><span @click.stop="handleClick(index+'-'+subindex+'-'+ssubindex)">{{ssubitem.fid}}-{{ssubitem.fvalue}}</span></template>
-                </el-menu-item>
-              </el-submenu>
-            </el-submenu>
-          </el-menu> -->
           <el-menu :default-openeds="idsArr" class="m-menu">
             <el-submenu v-for="item in categoryList" :key="item.fid" :index="item.fid">
               <template slot="title"><span class="w-600" :class="{activeStyle: ids[item.fid]}" @click.stop="handleClick(item.fid)">{{item.key}}</span></template>
@@ -32,21 +21,21 @@
         </el-aside>
         <el-main>
           <el-form :model="queryParams" ref="queryForm" :inline="true" class="search-form">
-            <el-form-item label="助记码" prop="fspell" @input="handleInputFspell">
-              <el-input v-model="queryParams.fspell" />
+            <el-form-item label="助记码" prop="fspell">
+              <el-input v-model="queryParams.fspell" @change="handleSearch" size="small" class="search-input" />
             </el-form-item>
-            <el-form-item label="商品代码" prop="fcode" @input="handleInputFcode">
-              <el-input v-model="queryParams.fcode" />
+            <el-form-item label="商品代码" prop="fitemcode">
+              <el-input v-model="queryParams.fitemcode" @change="handleSearch" size="small" class="search-input" />
             </el-form-item>
-            <el-form-item label="商品名称" prop="fname" @input="handleInputFname">
-              <el-input v-model="queryParams.fname" />
+            <el-form-item label="商品名称" prop="productName">
+              <el-input v-model="queryParams.productName" @change="handleSearch" size="small" class="search-input" />
             </el-form-item>
           </el-form>
 
-          <el-table height="100%" v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
+          <el-table height="100%" v-loading="loading" :data="requestData.rows" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" align="center" />
-            <el-table-column label="商品代码" align="center" prop="fcode" />
-            <el-table-column label="商品名称" align="center" prop="fname" />
+            <el-table-column label="商品代码" align="center" prop="fitemcode" />
+            <el-table-column label="商品名称" align="center" prop="productName" />
             <el-table-column label="助记码" align="center" prop="fspell" />
             <el-table-column label="规格" align="center" prop="fbspec" />
             <el-table-column label="单位" align="center" prop="fcateid" />
@@ -54,11 +43,11 @@
           </el-table>
             
           <pagination
-            v-show="total>0"
-            :total="total"
+            v-show="requestData.total>0"
+            :total="requestData.total"
             :page.sync="queryParams.pageNum"
             :limit.sync="queryParams.pageSize"
-            @pagination="getProductList"
+            @pagination="handleSearch"
           />
         </el-main>
     </el-container>
@@ -73,28 +62,33 @@ export default {
       type: Array,
       require: true
     },
+    requestData: { // 查询产品结果，包含total,product
+      type: Object,
+      require: true,
+      default: {
+        rows: [],
+        total: 0
+      }
+    },
+    loading: {
+      type: Boolean,
+      require: true,
+      default: false
+    }
   },
   data() {
     return {
       queryParams: {
-        fid: null,
+        fcateid: null,
         pageSize: 10,
         pageNum: 1,
-        fname: '', // 商品名称
-        fcode: '', // 商品代码
+        productName: '', // 商品名称
+        fitemcode: '', // 商品代码
         fspell: '' // 助记码
       },
       ids: {},
       idsArr: [],
-      productList: [
-        { fcode: 1, fname: 2, fspell: 3, fbspec: 4, fcateid: 5, fflag:6 },
-        { fcode: 1, fname: 2, fspell: 3, fbspec: 4, fcateid: 5, fflag:6 },
-        { fcode: 1, fname: 2, fspell: 3, fbspec: 4, fcateid: 5, fflag:6 },
-        { fcode: 1, fname: 2, fspell: 3, fbspec: 4, fcateid: 5, fflag:6 },
-        { fcode: 1, fname: 2, fspell: 3, fbspec: 4, fcateid: 5, fflag:6 }
-      ],
-      loading: false,
-      total: 5
+      selectedData: []
     }
   },
   created() {
@@ -120,16 +114,17 @@ export default {
     }
     this.$set(this.$data, 'ids', ids)
     this.$set(this.$data, 'idsArr', idsArr)
+    this.$emit('search', this.queryParams)
   },
   methods: {
     handleClose() {
       this.$emit('close')
     },
     handleSearch() {
-      this.$emit('search')
+      this.$emit('search', this.queryParams)
     },
     handleConfirm() {
-      this.$emit('confirm')
+      this.$emit('confirm', this.selectedData)
     },
     handleClick(val) {
       for(let x in this.ids) {
@@ -140,30 +135,17 @@ export default {
         }
       }
       if(val != '0000') {
-        this.queryParams.fid = val
+        this.queryParams.fcateid = val
+      }else {
+        this.queryParams.fcateid = null
       }
-      this.getProductList()
+      this.handleSearch()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
       // this.ids = selection.map(item => item.keyid)
-      console.log("selection===" + JSON.stringify(selection))
-      this.$emit('sendProductData', selection)
-    },
-    handleInputFspell() {
-      // 通过输入助记码查询商品
-      this.getProductList()
-    },
-    handleInputFcode() {
-      // 通过输入商品代码查询商品
-      this.getProductList()
-    },
-    handleInputFname() {
-      // 通过输入商品名称查询商品
-      this.getProductList()
-    },
-    getProductList() {
-      this.$emit('getProductData', this.queryParams)
+      // console.log("selection===" + JSON.stringify(selection))
+      this.selectedData = selection
     }
   },
   watch: {
@@ -255,8 +237,17 @@ export default {
     color: #303133;
   }
   ::v-deep .pagination-container {
-    margin: 0 17px 0 0 !important;
+    margin: 0 !important;
     padding: 0 16px !important;
     height: 32px;
+  }
+  .search-input {
+    width: 100px !important;
+  }
+  ::v-deep .el-form-item{
+    margin-bottom: 10px;
+  }
+  form.el-form--inline {
+    text-align: center;
   }
 </style>
