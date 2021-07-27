@@ -37,9 +37,13 @@
             <el-table-column label="商品代码" align="center" prop="fitemcode" />
             <el-table-column label="商品名称" align="center" prop="productName" />
             <el-table-column label="助记码" align="center" prop="fspell" />
-            <el-table-column label="规格" align="center" prop="fbspec" />
+            <el-table-column label="规格" align="center" prop="productSpec" />
             <el-table-column label="单位" align="center" prop="fcateid" />
-            <el-table-column label="是否启用" align="center" prop="fflag" />
+            <el-table-column label="是否启用" align="center" prop="fflag">
+              <template v-slot="scope">
+                <span>{{ scope.row.fflag == 1 ? "启用": "未启用" }}</span>
+              </template>
+            </el-table-column>
           </el-table>
             
           <pagination
