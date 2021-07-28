@@ -500,21 +500,47 @@ export default {
       this.popupLoading = true
       queryParams.fcode = this.form.fcode
       this.productListParams = queryParams
-      console.log('search========' + JSON.stringify(queryParams))
+      // console.log('search========' + JSON.stringify(queryParams))
       // 根据条件查询商品
       listPrice(
         queryParams
       ).then(response => {
         // 数据处理
         this.popupLoading = false
-        console.log(JSON.stringify(response))
+        // console.log(JSON.stringify(response))
         this.requestData.total = response.total
         this.requestData.rows = response.rows
       })
     },
-    handleConfirmEvent() {
+    handleConfirmEvent(data) {
       // 选择完成后，新增到产品列表
-      console.log('confirm')
+      console.log(JSON.stringify(this.form.yqPurchaseOrderDetailList))
+      if(data.length >0) {
+        for(let val of data) {
+          console.log(JSON.stringify(val))
+          let temp = {}
+          temp.createTime = val.createTime
+          temp. updateTime = val.updateTime
+          temp.remark = val.remark
+          temp.params = {}
+          temp.fid = val.fid
+          temp.keyid = ''
+          temp.fitemcode = val.fitemcode
+          temp.fitemname = val.productName
+          temp.fspec = val.productSpec
+          temp.funit = ''
+          temp.fprice = val.fprice
+          temp.fqty = 0
+          temp.famount = 0
+          temp.fbottle = ''
+          temp.fbottleqty = 0
+          temp.fcompanyid = 1
+          temp.fcateid = val.fcateid
+          temp.fmemo = null
+          temp.fbspec = val.productSpec
+          this.form.yqPurchaseOrderDetailList.push(temp)
+        }
+      }
       this.open = false
     },
     getCategory() {
