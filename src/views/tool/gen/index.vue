@@ -82,84 +82,85 @@
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
-
-    <el-table v-loading="loading" :data="tableList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
-      <el-table-column label="序号" type="index" width="50" align="center">
-        <template slot-scope="scope">
-          <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="表名称"
-        align="center"
-        prop="tableName"
-        :show-overflow-tooltip="true"
-        width="120"
+    <div class="container-bottom">
+      <el-table height="100%" v-loading="loading" :data="tableList" @selection-change="handleSelectionChange" class="table" fit>
+        <el-table-column type="selection" align="center" width="55"></el-table-column>
+        <el-table-column label="序号" type="index" width="50" align="center">
+          <template slot-scope="scope">
+            <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="表名称"
+          align="center"
+          prop="tableName"
+          :show-overflow-tooltip="true"
+          width="120"
+        />
+        <el-table-column
+          label="表描述"
+          align="center"
+          prop="tableComment"
+          :show-overflow-tooltip="true"
+          width="120"
+        />
+        <el-table-column
+          label="实体"
+          align="center"
+          prop="className"
+          :show-overflow-tooltip="true"
+          width="120"
+        />
+        <el-table-column label="创建时间" align="center" prop="createTime" width="160" />
+        <el-table-column label="更新时间" align="center" prop="updateTime" width="160" />
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              size="small"
+              icon="el-icon-view"
+              @click="handlePreview(scope.row)"
+              v-hasPermi="['tool:gen:preview']"
+            >预览</el-button>
+            <el-button
+              type="text"
+              size="small"
+              icon="el-icon-edit"
+              @click="handleEditTable(scope.row)"
+              v-hasPermi="['tool:gen:edit']"
+            >编辑</el-button>
+            <el-button
+              type="text"
+              size="small"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+              v-hasPermi="['tool:gen:remove']"
+            >删除</el-button>
+            <el-button
+              type="text"
+              size="small"
+              icon="el-icon-refresh"
+              @click="handleSynchDb(scope.row)"
+              v-hasPermi="['tool:gen:edit']"
+            >同步</el-button>
+            <el-button
+              type="text"
+              size="small"
+              icon="el-icon-download"
+              @click="handleGenTable(scope.row)"
+              v-hasPermi="['tool:gen:code']"
+            >生成代码</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
       />
-      <el-table-column
-        label="表描述"
-        align="center"
-        prop="tableComment"
-        :show-overflow-tooltip="true"
-        width="120"
-      />
-      <el-table-column
-        label="实体"
-        align="center"
-        prop="className"
-        :show-overflow-tooltip="true"
-        width="120"
-      />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160" />
-      <el-table-column label="更新时间" align="center" prop="updateTime" width="160" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-view"
-            @click="handlePreview(scope.row)"
-            v-hasPermi="['tool:gen:preview']"
-          >预览</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-edit"
-            @click="handleEditTable(scope.row)"
-            v-hasPermi="['tool:gen:edit']"
-          >编辑</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['tool:gen:remove']"
-          >删除</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-refresh"
-            @click="handleSynchDb(scope.row)"
-            v-hasPermi="['tool:gen:edit']"
-          >同步</el-button>
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-download"
-            @click="handleGenTable(scope.row)"
-            v-hasPermi="['tool:gen:code']"
-          >生成代码</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    </div>
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
       <el-tabs v-model="preview.activeName">
@@ -338,3 +339,35 @@ export default {
   }
 };
 </script>
+<style scoped>
+  .app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+  }
+  .container-bottom {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  .el-form-item {
+    margin-bottom: 5px;
+  }
+  .mb8 {
+    padding-left: 10px;
+  }
+  .table {
+    flex: 1;
+  }
+  .pagination-container {
+    margin: 0;
+    padding: 0 !important;
+    height: 50px;
+  }
+</style>

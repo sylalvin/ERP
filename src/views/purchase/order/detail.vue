@@ -35,7 +35,7 @@
         </el-form-item>
         <el-form-item label="车牌号" prop="fvehiclenum">
           <el-select v-model="form.fvehiclenum" placeholder="请选择车牌号">
-            <el-option label="请选择字典生成" value="" />
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
         <el-form-item label="配送方式" prop="fdeliverymethod">
@@ -45,17 +45,17 @@
         </el-form-item>
         <el-form-item label="司机" prop="fdriver">
           <el-select v-model="form.fdriver" placeholder="请选择司机">
-            <el-option label="请选择字典生成" value="" />
+            <el-option v-for="(item, index) in driverList" :key="index" :label="item.userName" :value="item.userId" />
           </el-select>
         </el-form-item>
         <el-form-item label="押运员" prop="fsupercargo">
           <el-select v-model="form.fsupercargo" placeholder="请选择押运员">
-            <el-option label="请选择字典生成" value="" />
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
         <el-form-item label="业务员" prop="fsalesman">
           <el-select v-model="form.fsalesman" placeholder="请选择业务员">
-            <el-option label="请选择字典生成" value="" />
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="fmemo">
@@ -66,7 +66,7 @@
         </el-form-item>
         <el-form-item label="发货人" prop="fshipper">
           <el-select v-model="form.fshipper" placeholder="请选择发货人">
-            <el-option label="请选择字典生成" value="" />
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
         <el-form-item label="区域" prop="farea">
@@ -79,7 +79,7 @@
         </el-form-item>
         <el-form-item label="业务类型" prop="fcate">
           <el-select v-model="form.fcate" placeholder="请选择业务类型">
-            <el-option label="请选择字典生成" value="" />
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
         <el-form-item label="作业区" prop="fdistributionpoint">
@@ -228,7 +228,7 @@ import { listDict } from "@/api/system/businessDict";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
 import { getBill } from "@/api/system/bill";
-import { listPrice, getPrice, delPrice, addPrice, updatePrice, exportPrice } from "@/api/basic/supplierPrice";
+import { listPrice } from "@/api/basic/supplierPrice";
 import Popup from "@/components/Popup";
 
 export default {
@@ -257,6 +257,11 @@ export default {
         pageSize: 20,
         fcode: null
       },
+      userListParams: { // 获取用户列表参数
+        pageNum: 1,
+        pageSize: 20,
+        postid: null
+      },
       productListParams: {}, // 查询商品参数
       productTemp: {}, // 所选商品临时信息
       // 表单参数
@@ -274,6 +279,11 @@ export default {
       areaDictList: [], // 区域
       businessDictList: [], // 业务类型
       operationDictList: [], // 操作区
+      driverList: [], // 司机
+      supercargoList: [], // 押运员
+      salesmanList: [], // 业务员
+      carnoList: [], // 车牌号
+      senderList: [], // 发货人
       keyid: null,
       activeText: ''
     }
@@ -355,9 +365,10 @@ export default {
       })
       listUser({
         pageNum: 1,
-        pageSize: 20
+        pageSize: 100
       }).then(response => {
-        // console.log(JSON.stringify(response.rows))
+        // console.log('User=====' + JSON.stringify(response.rows))
+        this.driverList = response.rows
       })
     },
     getSupplierListByName(query) { // 通过name得模糊查询
@@ -429,14 +440,24 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 修改按钮操作 */
+    /** 保存按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const keyid = row.keyid || this.ids
-      getOrder(keyid).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改采购";
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          if (this.form.keyid != null) { // 更新逻辑
+            updateOrder(this.form).then(response => {
+              this.msgSuccess("保存成功");
+              this.open = false;
+              // this.getList();
+            });
+          } else { // 新增逻辑
+            addOrder(this.form).then(response => {
+              this.msgSuccess("新增成功");
+              this.open = false;
+              // this.getList();
+            });
+          }
+        }
       });
     },
     /** 新增按钮操作 */
@@ -460,27 +481,6 @@ export default {
           this.$router.push('/')
         }
       }
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.open = false
-      // this.$refs["form"].validate(valid => {
-      //   if (valid) {
-      //     if (this.form.keyid != null) {
-      //       updateOrder(this.form).then(response => {
-      //         this.msgSuccess("保存成功");
-      //         this.open = false;
-      //         // this.getList();
-      //       });
-      //     } else {
-      //       addOrder(this.form).then(response => {
-      //         this.msgSuccess("新增成功");
-      //         this.open = false;
-      //         // this.getList();
-      //       });
-      //     }
-      //   }
-      // });
     },
     /** 删除按钮操作 */
     handleDelete(index, rows) {
@@ -528,7 +528,7 @@ export default {
           temp.fitemcode = val.fitemcode
           temp.fitemname = val.productName
           temp.fspec = val.productSpec
-          temp.funit = ''
+          temp.funit = '瓶'
           temp.fprice = val.fprice
           temp.fqty = 0
           temp.famount = 0
