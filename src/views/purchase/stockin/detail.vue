@@ -175,10 +175,23 @@
         <el-table-column
           prop="fitemcode"
           label="编码">
+          <template v-slot="scope">
+            <el-input
+              type="text"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fitemcode')}"
+              @focus="handleFocusDo(scope.row.fid + '-' + 'fitemcode')"
+              @blur="handleBlur"
+              v-model="scope.row.fitemcode" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="ft6warehouse"
+          label="仓库">
         </el-table-column>
         <el-table-column
           prop="fitemname"
-          label="品名">
+          label="名称">
         </el-table-column>
         <el-table-column
           prop="fspec"
@@ -189,21 +202,8 @@
           label="单位">
         </el-table-column>
         <el-table-column
-          prop="fprice"
-          label="单价">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fprice')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fprice')"
-              @blur="handleBlur"
-              v-model="scope.row.fprice" />
-          </template>
-        </el-table-column>
-        <el-table-column
           prop="fqty"
-          label="数量">
+          label="商品入库数">
           <template v-slot="scope">
             <el-input
               type="number"
@@ -215,17 +215,63 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="famount"
-          label="金额">
+          prop="fbottleqty"
+          label="容器入库数">
           <template v-slot="scope">
             <el-input
-              disabled
               type="number"
               class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'famount')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'famount')"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottleqty')"
               @blur="handleBlur"
-              v-model="scope.row.famount" />
+              v-model="scope.row.fbottleqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="freturnqty"
+          label="商品出库数">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'freturnqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'freturnqty')"
+              @blur="handleBlur"
+              v-model="scope.row.freturnqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="frecycleqty"
+          label="容器出库数">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'frecycleqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'frecycleqty')"
+              @blur="handleBlur"
+              v-model="scope.row.frecycleqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fbottlename"
+          label="包装物">
+          <template v-slot="scope">
+            <el-select 
+              v-model="scope.row.fbottlename" 
+              filterable 
+              placeholder="请选择"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottlename')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottlename')"
+              @blur="handleBlur">
+              <el-option
+                v-for="item in bottleList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </template>
         </el-table-column>
         <el-table-column
@@ -240,6 +286,10 @@
               @blur="handleBlur"
               v-model="scope.row.remark" />
           </template>
+        </el-table-column>
+        <el-table-column
+          prop="fspec"
+          label="类型">
         </el-table-column>
       </el-table>
     </div>
@@ -319,7 +369,8 @@ export default {
       carnoList: [], // 车牌号
       senderList: [], // 发货人
       keyid: null,
-      activeText: ''
+      activeText: '',
+      bottleList: []
     }
   },
   created() {
@@ -604,6 +655,10 @@ export default {
     },
     handleFocus(text) {
       this.activeText = text
+    },
+    handleFocusDo(text) {
+      this.activeText = text
+      this.open = true
     },
     handleBlur() {
       this.activeText = ''
