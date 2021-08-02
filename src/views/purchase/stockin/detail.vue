@@ -1,31 +1,37 @@
 <template>
   <div class="app-container">
     <div class="top-form">
-      <!-- 添加或修改采购表单 -->
+      <!-- 添加或修改采购入库表单 -->
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="单据编号" prop="keyid">
           <el-input v-model="form.keyid" disabled />
         </el-form-item>
-        <el-form-item label="配送日期" prop="fdate">
+        <el-form-item label="制单人" prop="createby">
+          <el-input v-model="form.createby" disabled />
+        </el-form-item>
+        <el-form-item label="日期" prop="fdate">
           <el-date-picker clearable
             v-model="form.fdate"
             type="date"
             value-format="yyyy-MM-dd"
-            placeholder="选择配送日期">
+            placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="供应商代码" prop="fcode">
-          <el-select v-model="form.fcode" placeholder="请选择供应商代码" clearable filterable remote :remote-method="getSupplierListByCode">
+        <el-form-item label="对账单号" prop="freconciliation">
+          <el-input v-model="form.freconciliation" placeholder="请输入对账单号" />
+        </el-form-item>
+        <el-form-item label="客户代码" prop="fcode">
+          <el-select v-model="form.fcode" placeholder="请选择客户代码" clearable filterable remote :remote-method="getSupplierListByCode">
             <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商名称" prop="fname">
-          <el-select v-model="form.fname" placeholder="请选择供应商名称" clearable filterable remote :remote-method="getSupplierListByName">
+        <el-form-item label="客户名称" prop="fname">
+          <el-select v-model="form.fname" placeholder="请选择客户名称" clearable filterable remote :remote-method="getSupplierListByName">
           <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商地址" prop="faddress">
-          <el-input v-model="form.faddress" placeholder="请输入供应商地址" />
+        <el-form-item label="地址" prop="faddress">
+          <el-input v-model="form.faddress" placeholder="地址" />
         </el-form-item>
         <el-form-item label="电话" prop="fphone">
           <el-input v-model="form.fphone" placeholder="请输入电话" />
@@ -33,8 +39,36 @@
         <el-form-item label="联系人" prop="flinkman">
           <el-input v-model="form.flinkman" placeholder="请输入联系人" />
         </el-form-item>
+        <el-form-item label="运输服务费" prop="ffreight">
+          <el-input v-model="form.ffreight" placeholder="请输入运输服务费" />
+        </el-form-item>
+        <el-form-item label="押运员" prop="fsupercargo">
+          <el-select v-model="form.fsupercargo" placeholder="请选择押运员">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发货人" prop="fshipper">
+          <el-select v-model="form.fshipper" placeholder="请选择发货人">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="车牌号" prop="fvehiclenum">
           <el-select v-model="form.fvehiclenum" placeholder="请选择车牌号">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="司机" prop="fdriver">
+          <el-select v-model="form.fdriver" placeholder="请选择司机">
+            <el-option v-for="(item, index) in driverList" :key="index" :label="item.userName" :value="item.userId" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="区域" prop="farea">
+          <el-select v-model="form.farea" placeholder="请选择区域">
+            <el-option v-for="(item, index) in areaDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="业务员" prop="fsalesman">
+          <el-select v-model="form.fsalesman" placeholder="请选择业务员">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
@@ -43,49 +77,49 @@
             <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
-        <el-form-item label="司机" prop="fdriver">
-          <el-select v-model="form.fdriver" placeholder="请选择司机">
-            <el-option v-for="(item, index) in driverList" :key="index" :label="item.userName" :value="item.userId" />
+        <el-form-item label="采购订单" prop="flogisticsnumber">
+          <el-select v-model="form.flogisticsnumber" placeholder="请选择采购订单" clearable filterable remote :remote-method="getSupplierListByCode">
+            <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
           </el-select>
         </el-form-item>
-        <el-form-item label="押运员" prop="fsupercargo">
-          <el-select v-model="form.fsupercargo" placeholder="请选择押运员">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+        <el-form-item label="银行账户" prop="fsubjectcode">
+          <el-select v-model="form.fsubjectcode" placeholder="请选择银行账户">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
-        <el-form-item label="业务员" prop="fsalesman">
-          <el-select v-model="form.fsalesman" placeholder="请选择业务员">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+        <el-form-item label="付款金额" prop="famt">
+          <el-input v-model="form.famt" placeholder="请输入付款金额" />
+        </el-form-item>
+        <el-form-item label="采购类型" prop="ft6purchasetype">
+          <el-select v-model="form.ft6purchasetype" placeholder="请选择采购类型">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="收发类型" prop="ft6receivesendtype">
+          <el-select v-model="form.ft6receivesendtype" placeholder="请选择收发类型">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="币种" prop="ft6currency">
+          <el-select v-model="form.ft6currency" placeholder="请选择币种">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="汇率" prop="ft6exchangerate">
+          <el-input v-model="form.ft6exchangerate" placeholder="请输入汇率" />
+        </el-form-item>
+        <el-form-item label="作业区" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="仓库" prop="ft6warehouse">
+          <el-select v-model="form.ft6warehouse" placeholder="请选择仓库">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="fmemo">
           <el-input v-model="form.fmemo" placeholder="请输入备注" />
-        </el-form-item>
-        <el-form-item label="运输服务费" prop="ffreight">
-          <el-input v-model="form.ffreight" placeholder="请输入运输服务费" />
-        </el-form-item>
-        <el-form-item label="发货人" prop="fshipper">
-          <el-select v-model="form.fshipper" placeholder="请选择发货人">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="区域" prop="farea">
-          <el-select v-model="form.farea" placeholder="请选择区域">
-            <el-option v-for="(item, index) in areaDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="物流单号" prop="flogisticsnumber">
-          <el-input v-model="form.flogisticsnumber" placeholder="请输入物流单号" />
-        </el-form-item>
-        <el-form-item label="业务类型" prop="fcate">
-          <el-select v-model="form.fcate" placeholder="请选择业务类型">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="作业区" prop="fdistributionpoint">
-          <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
         </el-form-item>
       </el-form>
     </div>
@@ -222,7 +256,7 @@
 </template>
 
 <script>
-import { getOrder, addOrder, updateOrder } from "@/api/purchase/order";
+import { getStockin, addStockin, updateStockin } from "@/api/purchase/stockin";
 import { listSupplier } from "@/api/basic/supplier";
 import { listDict } from "@/api/system/businessDict";
 import { listItem } from "@/api/system/businessDictItem";
@@ -232,7 +266,7 @@ import { listPrice } from "@/api/basic/supplierPrice";
 import Popup from "@/components/Popup";
 
 export default {
-  name: "OrderDetail",
+  name: "StockinDetail",
   data() {
     return {
       categoryList: [],
@@ -289,12 +323,12 @@ export default {
     }
   },
   created() {
-    this.keyid = this.$route.query.keyid
+    this.keyid = this.$route.query.keyid[0]
     if(this.keyid) {
-      this.$route.meta.title = this.title = '编辑采购订单'
-      this.getOrderDetail(this.keyid)
+      this.$route.meta.title = this.title = '编辑采购入库单'
+      this.getStockinDetail(this.keyid)
     }else {
-      this.$route.meta.title = this.title = '添加采购订单'
+      this.$route.meta.title = this.title = '添加采购入库单'
       this.getBillNumber();
     }
     this.getDictList();
@@ -311,8 +345,8 @@ export default {
       })
     },
     /** 查询采购订单详情 */
-    getOrderDetail(keyid) {
-      getOrder(keyid).then(response => {
+    getStockinDetail(keyid) {
+      getStockin(keyid).then(response => {
         this.loading = false
         this.reset()
         Object.assign(this.form, response.data)
@@ -573,27 +607,7 @@ export default {
     },
     handleBlur() {
       this.activeText = ''
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.keyid != null) {
-            updateOrder(this.form).then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            addOrder(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
-          }
-        }
-      });
-    },
+    }
   },
   computed: {
     visitedViews() {

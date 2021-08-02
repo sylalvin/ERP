@@ -100,10 +100,10 @@
           @click="handleClose"
         >关闭</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
     </el-row>
 
-    <el-table height="100%" v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
+    <el-table height="100%" v-loading="loading" :data="orderList" @selection-change="handleSelectionChange" fit>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="单据编号" align="center" prop="keyid" />
       <el-table-column label="配送日期" align="center" prop="fdate" width="180">
