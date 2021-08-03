@@ -73,7 +73,7 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="运输服务费：" prop="ffreight">
-          <el-tooltip :content="form.ffreight">
+          <el-tooltip :content="form.ffreight + ''">
             <span>{{ form.ffreight }}</span>
           </el-tooltip>
         </el-form-item>
@@ -118,17 +118,17 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="应付金额：" prop="famount">
-          <el-tooltip :content="form.famount">
+          <el-tooltip :content="form.famount + ''">
             <span>{{ form.famount }}</span>
           </el-tooltip>
         </el-form-item>
         <el-form-item label="实付金额：" prop="famt">
-          <el-tooltip :content="form.famt">
+          <el-tooltip :content="form.famt + ''">
             <span>{{ form.famt }}</span>
           </el-tooltip>
         </el-form-item>
         <el-form-item label="目前欠款：" prop="ft6purchasetype">
-          <el-tooltip :content="form.ft6purchasetype">
+          <el-tooltip :content="form.ft6purchasetype + ''">
             <span>{{ form.ft6purchasetype }}</span>
           </el-tooltip>
         </el-form-item>
@@ -348,14 +348,12 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/purchase/stockin/edit') return
+        console.log("xxxxxxxxxxxxxxxxx")
+        if(val.path != '/purchase/stockin/detail') return
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '编辑采购入库单'
-          this.getOrderDetail(this.keyid);
-        }else {
-          this.$route.meta.title = this.title = '添加采购入库单'
-          this.getBillNumber();
+          this.$route.meta.title = this.title = '采购入库单详情'
+          this.getStockinDetail(this.keyid);
         }
         const visitedViews = this.$store.state.tagsView.visitedViews
         for(let item of visitedViews) {
