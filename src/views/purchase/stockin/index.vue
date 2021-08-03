@@ -94,7 +94,11 @@
 
     <el-table height="100%" v-loading="loading" :data="stockinList" @selection-change="handleSelectionChange" fit>
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="单据号" align="center" prop="keyid" />
+      <el-table-column label="单据号" align="center" prop="keyid">
+        <template v-slot="scope">
+          <el-link type="primary" @click="openDetail(scope.row)">{{scope.row.keyid}}</el-link>
+        </template>
+      </el-table-column>
       <el-table-column label="作废标识" align="center" prop="fflag" />
       <el-table-column label="单据状态" align="center" prop="fstatus" />
       <el-table-column label="上传" align="center" prop="ft6status" />
@@ -238,8 +242,8 @@ export default {
     handleUpdate(row) {
       const keyid = row.keyid || this.ids
       const route = {
-        name: "StockinDetail",
-        path: "/purchase/stockin/detail",
+        name: "StockinEdit",
+        path: "/purchase/stockin/edit",
         query: {
           keyid: keyid
         }
@@ -253,8 +257,8 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       const route = {
-        name: "StockinDetail",
-        path: "/purchase/stockin/detail"
+        name: "StockinEdit",
+        path: "/purchase/stockin/edit"
       }
       Object.assign(route, {
         meta: { title: '添加采购入库单' }
@@ -327,7 +331,22 @@ export default {
           this.download(response.msg);
           this.exportLoading = false;
         }).catch(() => {});
-    }
+    },
+    /** 查看详情按钮操作 */
+    openDetail(row) {
+      const keyid = row.keyid || this.ids
+      const route = {
+        name: "StockinDetail",
+        path: "/purchase/stockin/detail",
+        query: {
+          keyid: keyid
+        }
+      }
+      Object.assign(route, {
+        meta: { title: '采购入库单详情' }
+      })
+      this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
+    },
   },
   computed: {
     visitedViews() {

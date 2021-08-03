@@ -1,150 +1,16 @@
 <template>
   <div class="app-container">
-    <div class="top-form">
-      <!-- 添加或修改采购入库表单 -->
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="单据编号" prop="keyid">
-          <el-input v-model="form.keyid" disabled />
-        </el-form-item>
-        <el-form-item label="制单人" prop="createby">
-          <el-input v-model="form.createby" disabled />
-        </el-form-item>
-        <el-form-item label="日期" prop="fdate">
-          <el-date-picker clearable
-            v-model="form.fdate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="对账单号" prop="freconciliation">
-          <el-input v-model="form.freconciliation" placeholder="请输入对账单号" />
-        </el-form-item>
-        <el-form-item label="客户代码" prop="fcode">
-          <el-select v-model="form.fcode" placeholder="请选择客户代码" clearable filterable remote :remote-method="getSupplierListByCode">
-            <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="客户名称" prop="fname">
-          <el-select v-model="form.fname" placeholder="请选择客户名称" clearable filterable remote :remote-method="getSupplierListByName">
-          <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="地址" prop="faddress">
-          <el-input v-model="form.faddress" placeholder="地址" />
-        </el-form-item>
-        <el-form-item label="电话" prop="fphone">
-          <el-input v-model="form.fphone" placeholder="请输入电话" />
-        </el-form-item>
-        <el-form-item label="联系人" prop="flinkman">
-          <el-input v-model="form.flinkman" placeholder="请输入联系人" />
-        </el-form-item>
-        <el-form-item label="运输服务费" prop="ffreight">
-          <el-input v-model="form.ffreight" placeholder="请输入运输服务费" />
-        </el-form-item>
-        <el-form-item label="押运员" prop="fsupercargo">
-          <el-select v-model="form.fsupercargo" placeholder="请选择押运员">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="发货人" prop="fshipper">
-          <el-select v-model="form.fshipper" placeholder="请选择发货人">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="车牌号" prop="fvehiclenum">
-          <el-select v-model="form.fvehiclenum" placeholder="请选择车牌号">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="司机" prop="fdriver">
-          <el-select v-model="form.fdriver" placeholder="请选择司机">
-            <el-option v-for="(item, index) in driverList" :key="index" :label="item.userName" :value="item.userId" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="区域" prop="farea">
-          <el-select v-model="form.farea" placeholder="请选择区域">
-            <el-option v-for="(item, index) in areaDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="业务员" prop="fsalesman">
-          <el-select v-model="form.fsalesman" placeholder="请选择业务员">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="配送方式" prop="fdeliverymethod">
-          <el-select v-model="form.fdeliverymethod" placeholder="请选择配送方式">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="采购订单" prop="flogisticsnumber">
-          <el-select v-model="form.flogisticsnumber" placeholder="请选择采购订单" clearable filterable remote :remote-method="getSupplierListByCode">
-            <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="银行账户" prop="fsubjectcode">
-          <el-select v-model="form.fsubjectcode" placeholder="请选择银行账户">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="付款金额" prop="famt">
-          <el-input v-model="form.famt" placeholder="请输入付款金额" />
-        </el-form-item>
-        <el-form-item label="采购类型" prop="ft6purchasetype">
-          <el-select v-model="form.ft6purchasetype" placeholder="请选择采购类型">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="收发类型" prop="ft6receivesendtype">
-          <el-select v-model="form.ft6receivesendtype" placeholder="请选择收发类型">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="币种" prop="ft6currency">
-          <el-select v-model="form.ft6currency" placeholder="请选择币种">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="汇率" prop="ft6exchangerate">
-          <el-input v-model="form.ft6exchangerate" placeholder="请输入汇率" />
-        </el-form-item>
-        <el-form-item label="作业区" prop="fdistributionpoint">
-          <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="仓库" prop="ft6warehouse">
-          <el-select v-model="form.ft6warehouse" placeholder="请选择仓库">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="fmemo">
-          <el-input v-model="form.fmemo" placeholder="请输入备注" />
-        </el-form-item>
-      </el-form>
-    </div>
     <div class="middle-form">
       <el-row :gutter="10">
         <el-col :span="1.5">
           <el-button
-            type="primary"
-            plain
-            icon="el-icon-plus"
-            size="mini"
-            :disabled="form.fname ? false : true"
-            @click="handleAdd"
-            v-hasPermi="['purchase:order:add']"
-          >新增</el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button
-            type="success"
+            type="warning"
             plain
             icon="el-icon-edit"
             size="mini"
             @click="handleUpdate"
-            v-hasPermi="['purchase:order:edit']"
-          >保存</el-button>
+            v-hasPermi="['purchase:stockin:edit']"
+          >打印</el-button>
         </el-col>
         <el-col :span="1.5">
           <el-button
@@ -157,247 +23,220 @@
         </el-col>
       </el-row>
     </div>
-    <div class="bottom-form">
-      <el-table
-        :data="form.yqPurchaseOrderDetailList"
-        stripe
-        style="width: 100%"
-        height="100%">
-        <el-table-column label="删除" fixed width="100" align="center">
-          <template v-slot="scope">
-            <el-button
-              type="text"
-              icon="el-icon-remove"
-              @click="handleDelete(scope.$index, form.yqPurchaseOrderDetailList)"
-            ></el-button>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="fitemcode"
-          label="编码">
-          <template v-slot="scope">
-            <el-input
-              type="text"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fitemcode')}"
-              @focus="handleFocusDo(scope.row.fid + '-' + 'fitemcode')"
-              @blur="handleBlur"
-              v-model="scope.row.fitemcode" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="ft6warehouse"
-          label="仓库">
-        </el-table-column>
-        <el-table-column
-          prop="fitemname"
-          label="名称">
-        </el-table-column>
-        <el-table-column
-          prop="fspec"
-          label="规格">
-        </el-table-column>
-        <el-table-column
-          prop="funit"
-          label="单位">
-        </el-table-column>
-        <el-table-column
-          prop="fqty"
-          label="商品入库数">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fqty')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fqty')"
-              @blur="handleBlur"
-              v-model="scope.row.fqty" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="fbottleqty"
-          label="容器入库数">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleqty')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fbottleqty')"
-              @blur="handleBlur"
-              v-model="scope.row.fbottleqty" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="freturnqty"
-          label="商品出库数">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'freturnqty')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'freturnqty')"
-              @blur="handleBlur"
-              v-model="scope.row.freturnqty" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="frecycleqty"
-          label="容器出库数">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'frecycleqty')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'frecycleqty')"
-              @blur="handleBlur"
-              v-model="scope.row.frecycleqty" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="fbottlename"
-          label="包装物">
-          <template v-slot="scope">
-            <el-select 
-              v-model="scope.row.fbottlename" 
-              filterable 
-              placeholder="请选择"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottlename')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fbottlename')"
-              @blur="handleBlur">
-              <el-option
-                v-for="item in bottleList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="remark"
-          label="备注说明">
-          <template v-slot="scope">
-            <el-input
-              type="text"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'remark')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'remark')"
-              @blur="handleBlur"
-              v-model="scope.row.remark" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="fspec"
-          label="类型">
-        </el-table-column>
-      </el-table>
-    </div>
 
-    <!-- 添加或修改采购对话框 -->
-    <el-dialog :visible.sync="open" title="商品档案">
-      <div slot="title" class="dialog-title">
-        <i class="el-icon-menu"></i>
-        商品档案
-      </div>
-      <popup :category-list="categoryList" :request-data="requestData" :loading="popupLoading" @close="handleCloseEvent" @search="handleSearchEvent" @confirm="handleConfirmEvent"/>
-    </el-dialog>
+    <div class="top-form">
+      <!-- 采购入库详情表单 -->
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="单据编号：" prop="keyid">
+          <el-tooltip :content="form.keyid">
+            <span>{{ form.keyid }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="制单人：" prop="createby">
+          <el-tooltip :content="form.createby">
+            <span>{{ form.createby }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="日期：" prop="fdate">
+          <el-tooltip :content="form.fdate">
+            <span>{{ form.fdate }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="对账单号：" prop="freconciliation">
+          <el-tooltip :content="form.freconciliation">
+            <span>{{ form.freconciliation }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="客户代码：" prop="fcode">
+          <el-tooltip :content="form.fcode">
+            <span>{{ form.fcode }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="客户名称：" prop="fname">
+          <el-tooltip :content="form.fname">
+            <span>{{ form.fname }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="地址：" prop="faddress">
+          <el-tooltip :content="form.faddress">
+            <span>{{ form.faddress }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="电话：" prop="fphone">
+          <el-tooltip :content="form.fphone">
+            <span>{{ form.fphone }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="联系人：" prop="flinkman">
+          <el-tooltip :content="form.flinkman">
+            <span>{{ form.flinkman }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="运输服务费：" prop="ffreight">
+          <el-tooltip :content="form.ffreight">
+            <span>{{ form.ffreight }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="押运员：" prop="fsupercargo">
+          <el-tooltip :content="form.fsupercargo">
+            <span>{{ form.fsupercargo }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="发货人：" prop="fshipper">
+          <el-tooltip :content="form.fshipper">
+            <span>{{ form.fshipper }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="车牌号：" prop="fvehiclenum">
+          <el-tooltip :content="form.fvehiclenum">
+            <span>{{ form.fvehiclenum }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="司机：" prop="fdriver">
+          <el-tooltip :content="form.fdriver">
+            <span>{{ form.fdriver }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="区域：" prop="farea">
+          <el-tooltip :content="form.farea">
+            <span>{{ form.farea }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="业务员：" prop="fsalesman">
+          <el-tooltip :content="form.fsalesman">
+            <span>{{ form.fsalesman }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="配送方式：" prop="fdeliverymethod">
+          <el-tooltip :content="form.fdeliverymethod">
+            <span>{{ form.fdeliverymethod }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="物流单号：" prop="flogisticsnumber">
+          <el-tooltip :content="form.flogisticsnumber">
+            <span>{{ form.flogisticsnumber }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="应付金额：" prop="famount">
+          <el-tooltip :content="form.famount">
+            <span>{{ form.famount }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="实付金额：" prop="famt">
+          <el-tooltip :content="form.famt">
+            <span>{{ form.famt }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="目前欠款：" prop="ft6purchasetype">
+          <el-tooltip :content="form.ft6purchasetype">
+            <span>{{ form.ft6purchasetype }}</span>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="备注：" prop="fmemo">
+          <el-tooltip :content="form.fmemo">
+            <span>{{ form.fmemo }}</span>
+          </el-tooltip>
+        </el-form-item>
+      </el-form>
+    </div>
+  
+    <div class="bottom-form">
+      <el-tabs v-model="activeName" type="card">
+        <el-tab-pane label="销售明细" name="first">
+          <el-table
+            :data="form.stockinDetailsList"
+            stripe
+            :header-cell-style="headerStyle"
+            height="100%">
+            <el-table-column
+              prop="fitemcode"
+              label="编码">
+            </el-table-column>
+            <el-table-column
+              prop="fitemname"
+              label="名称">
+            </el-table-column>
+            <el-table-column
+              prop="fspec"
+              label="规格">
+            </el-table-column>
+            <el-table-column
+              prop="funit"
+              label="单位">
+            </el-table-column>
+            <el-table-column
+              prop="funit"
+              label="单价">
+            </el-table-column>
+            <el-table-column
+              prop="fqty"
+              label="数量">
+            </el-table-column>
+            <el-table-column
+              prop="famount"
+              label="金额">
+            </el-table-column>
+            <el-table-column
+              prop="fbottle"
+              label="包装物">
+            </el-table-column>
+            <el-table-column
+              prop="fbottle"
+              label="气瓶数量">
+            </el-table-column>
+            <el-table-column
+              prop="remark"
+              label="备注说明">
+            </el-table-column>
+            <el-table-column
+              prop="remark"
+              label="已提瓶">
+            </el-table-column>
+            <el-table-column
+              prop="fcateid"
+              label="类型">
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="单据状态" name="second">单据状态</el-tab-pane>
+        <el-tab-pane label="审批流程" name="third">审批流程</el-tab-pane>
+        <el-tab-pane label="明细变更" name="fourth">明细变更</el-tab-pane>
+      </el-tabs>
+    </div>
   </div>
 </template>
 
 <script>
-import { getStockin, addStockin, updateStockin } from "@/api/purchase/stockin";
-import { listSupplier } from "@/api/basic/supplier";
-import { listDict } from "@/api/system/businessDict";
-import { listItem } from "@/api/system/businessDictItem";
-import { listUser } from "@/api/system/user";
-import { getBill } from "@/api/system/bill";
-import { listPrice } from "@/api/basic/supplierPrice";
-import Popup from "@/components/Popup";
+import { getStockin } from "@/api/purchase/stockin";
 
 export default {
   name: "StockinDetail",
   data() {
     return {
-      categoryList: [],
-      requestData: {
-        rows: [],
-        total: 0
-      },
       // 遮罩层
       loading: true,
-      popupLoading: false,
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
-      supplierListNameParams: { // 通过Name查询供应商参数
-        pageNum: 1,
-        pageSize: 20,
-        fname: null
-      },
-      supplierListCodeParams: { // 通过Code查询供应商参数
-        pageNum: 1,
-        pageSize: 20,
-        fcode: null
-      },
-      userListParams: { // 获取用户列表参数
-        pageNum: 1,
-        pageSize: 20,
-        postid: null
-      },
-      productListParams: {}, // 查询商品参数
-      productTemp: {}, // 所选商品临时信息
       // 表单参数
       form: {},
-      // 表单校验
-      rules: {
-        keyid: [
-          { required: true, message: "单据编号不能为空", trigger: "blur" }
-        ],
-      },
-      supplierListName: [],
-      supplierListCode: [],
-      billDictList: [], // 单据状态
-      deliveryDictList: [], // 配送方式
-      areaDictList: [], // 区域
-      businessDictList: [], // 业务类型
-      operationDictList: [], // 操作区
-      driverList: [], // 司机
-      supercargoList: [], // 押运员
-      salesmanList: [], // 业务员
-      carnoList: [], // 车牌号
-      senderList: [], // 发货人
       keyid: null,
-      activeText: '',
-      bottleList: []
+      activeName: 'first'
     }
   },
   created() {
-    this.keyid = this.$route.query.keyid[0]
+    this.keyid = this.$route.query.keyid
     if(this.keyid) {
-      this.$route.meta.title = this.title = '编辑采购入库单'
+      this.$route.meta.title = this.title = '采购入库单详情'
       this.getStockinDetail(this.keyid)
+      // this.$message.success('获取采购入库单单据号成功');
     }else {
-      this.$route.meta.title = this.title = '添加采购入库单'
-      this.getBillNumber();
+      // 获取采购入库单失败
+      this.$message.error('获取采购入库单单据号失败');
     }
-    this.getDictList();
-    this.getCategory(); // 获取产品数据对象
   },
   methods: {
-    /** 获取单据号 */
-    getBillNumber() {
-      getBill({
-        prefix: 'TM'
-      }).then(response => {
-        this.reset()
-        this.form.keyid = response.data
-      })
-    },
     /** 查询采购订单详情 */
     getStockinDetail(keyid) {
       getStockin(keyid).then(response => {
+        // console.log(JSON.stringify(response))
         this.loading = false
         this.reset()
         Object.assign(this.form, response.data)
@@ -405,89 +244,18 @@ export default {
         this.loading = false
       })
     },
-    /** 查询字典，初始化页面数据 */
-    getDictList() {
-      // 获取单据状态
-      listItem({
-        pageNum: 1,
-        pageSize: 20,
-        fsparent: 1007
-      }).then(response => {
-        this.billDictList = response.rows
-        // this.getList() // 先获取单据状态，根据单据状态渲染列表
-      })
-      // 获取配送方式
-      listItem({
-        pageNum: 1,
-        pageSize: 20,
-        fsparent: 1009
-      }).then(response => {
-        this.deliveryDictList = response.rows
-      })
-      // 获取区域
-      listItem({
-        pageNum: 1,
-        pageSize: 20,
-        fsparent: 1004
-      }).then(response => {
-        this.areaDictList = response.rows
-      })
-      // // 获取业务类型
-      // listItem({
-      //   pageNum: 1,
-      //   pageSize: 20,
-      //   fsparent: 1007
-      // }).then(response => {
-      // this.businessDictList = response.rows
-      // })
-      // 获取作业区
-      listItem({
-        pageNum: 1,
-        pageSize: 20,
-        fsparent: 1026
-      }).then(response => {
-        this.operationDictList = response.rows
-      })
-      listUser({
-        pageNum: 1,
-        pageSize: 100
-      }).then(response => {
-        // console.log('User=====' + JSON.stringify(response.rows))
-        this.driverList = response.rows
-      })
-    },
-    getSupplierListByName(query) { // 通过name得模糊查询
-      if(query=='') {
-        this.supplierListName = []
-        return
-      }
-      this.supplierListNameParams.fname = query
-      listSupplier(this.supplierListNameParams).then(response => {
-        this.supplierListName = response.rows;
-      });
-    },
-    getSupplierListByCode(query) { // 通过code得模糊查询
-      if(query=='') {
-        this.supplierListCode = []
-        return
-      }
-      this.supplierListCodeParams.fcode = query
-      listSupplier(this.supplierListCodeParams).then(response => {
-        this.supplierListCode = response.rows;
-      });
-    },
-    // 取消按钮
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
     // 表单重置
     reset() {
       this.form = {
+        createTime: null,
+        updateTime: null,
+        remark: null,
+        params: null,
         keyid: null,
         fcompanyid: null,
-        createby: null,
         fdate: null,
+        beginDate: null,
+        endDate: null,
         fcode: null,
         fname: null,
         faddress: null,
@@ -497,57 +265,57 @@ export default {
         fdeliverymethod: null,
         fdriver: null,
         fsupercargo: null,
-        fsalesman: null,
+        fshipper: null,
         fmemo: null,
         fflag: null,
         fupdateby: null,
-        fupdatedate: null,
+        fupdate: null,
         ftype: null,
         ffreight: null,
         famount: null,
-        fshipper: null,
+        famt: null,
+        fdiscountamount: null,
         fprogress: null,
         fstatus: null,
-        fauditor: null,
-        fauditflag: null,
+        freconciliation: null,
+        fsalesman: null,
         farea: null,
         flogisticsnumber: null,
         fdeleteflag: null,
         fcate: null,
+        fsubjectcode: null,
+        fsubjectname: null,
+        fassociatedno: null,
         fdispatchnum: null,
-        foutflag: null,
+        fsknum: null,
+        fclass: null,
+        ft6warehouse: null,
+        ft6saletype: null,
+        ft6saletypenum: null,
+        ft6purchasetype: null,
+        ft6purchasetypenum: null,
+        ft6receivesendtype: null,
+        ft6receivesendtypenum: null,
+        ft6department: null,
+        ft6currency: null,
+        ft6exchangerate: null,
+        ft6status: null,
+        ft6date: null,
         fdistributionpoint: null,
-        forgid: null,
-        forgname: null,
-        fbill: null,
-        fpoint: null,
-        yqPurchaseOrderDetailList: []
+        fgroup: null,
+        ftime1: null,
+        ftime2: null,
+        ftime3: null,
+        ftime4: null,
+        stockinDetailsList: [],
+        stockinDetail: null,
+        createBy: null,
       };
       this.resetForm("form");
     },
-    /** 保存按钮操作 */
+    /** 打印按钮操作 */
     handleUpdate(row) {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.keyid != null) { // 更新逻辑
-            updateOrder(this.form).then(response => {
-              this.msgSuccess("保存成功");
-              this.open = false;
-              // this.getList();
-            });
-          } else { // 新增逻辑
-            addOrder(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              // this.getList();
-            });
-          }
-        }
-      });
-    },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.open = true
+      
     },
     /** 关闭按钮操作 */
     handleClose() {
@@ -567,101 +335,9 @@ export default {
         }
       }
     },
-    /** 删除按钮操作 */
-    handleDelete(index, rows) {
-      this.$confirm('是否确认删除商品："' + rows[index].fitemname, "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          rows.splice(index,1)
-        }).catch(() => {})
-    },
-    handleCloseEvent() {
-      console.log('close')
-      this.open = false
-    },
-    handleSearchEvent(queryParams) {
-      this.popupLoading = true
-      queryParams.fcode = this.form.fcode
-      this.productListParams = queryParams
-      // console.log('search========' + JSON.stringify(queryParams))
-      // 根据条件查询商品
-      listPrice(
-        queryParams
-      ).then(response => {
-        // 数据处理
-        this.popupLoading = false
-        // console.log(JSON.stringify(response))
-        this.requestData.total = response.total
-        this.requestData.rows = response.rows
-      })
-    },
-    handleConfirmEvent(data) {
-      // 选择完成后，新增到产品列表
-      console.log(JSON.stringify(this.form.yqPurchaseOrderDetailList))
-      if(data.length >0) {
-        for(let val of data) {
-          console.log(JSON.stringify(val))
-          let temp = {}
-          temp.createTime = val.createTime
-          temp. updateTime = val.updateTime
-          temp.remark = val.remark
-          temp.params = {}
-          temp.fid = val.fid
-          temp.keyid = ''
-          temp.fitemcode = val.fitemcode
-          temp.fitemname = val.productName
-          temp.fspec = val.productSpec
-          temp.funit = val.funit
-          temp.fprice = val.fprice
-          temp.fqty = 0
-          temp.famount = 0
-          temp.fbottle = ''
-          temp.fbottleqty = 0
-          temp.fcompanyid = 1
-          temp.fcateid = val.fcateid
-          temp.fmemo = null
-          temp.fbspec = val.productSpec
-          this.form.yqPurchaseOrderDetailList.push(temp)
-        }
-      }
-      this.open = false
-    },
-    getCategory() {
-      listDict({
-        pageNum: 1,
-        pageSize: 100
-      }).then(response => {
-        this.categoryList[0] = {}
-        this.categoryList[0].key = '产品分类'
-        this.categoryList[0].fid = '0000'
-        this.categoryList[0].value = response.rows.filter(item => {
-          return item.fid == '2000' || item.fid == '2001' || item.fid == '2002'
-        })
-        for(let value of this.categoryList[0].value) {
-          listItem({
-            pageNum: 1,
-            pageSize: 100,
-            fsparent: value.fid
-          }).then(response => {
-            value.childList = response.rows
-            if(this.categoryList[0].value[this.categoryList[0].value.length-1] == value) {
-              // console.log(JSON.stringify(this.categoryList))
-            }
-          })
-        }
-      })
-    },
-    handleFocus(text) {
-      this.activeText = text
-    },
-    handleFocusDo(text) {
-      this.activeText = text
-      this.open = true
-    },
-    handleBlur() {
-      this.activeText = ''
+    
+    headerStyle() {
+      return "text-align: center;border: 1px solid #ccc;"
     }
   },
   computed: {
@@ -672,13 +348,13 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/purchase/order/detail') return
+        if(val.path != '/purchase/stockin/edit') return
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '编辑采购订单'
+          this.$route.meta.title = this.title = '编辑采购入库单'
           this.getOrderDetail(this.keyid);
         }else {
-          this.$route.meta.title = this.title = '添加采购订单'
+          this.$route.meta.title = this.title = '添加采购入库单'
           this.getBillNumber();
         }
         const visitedViews = this.$store.state.tagsView.visitedViews
@@ -688,16 +364,7 @@ export default {
           }
         }
       }
-    },
-    'form.fcode': function(newVal, oldVal) {
-      if((newVal != null) && (newVal != oldVal)) {
-          this.productListParams.fcode = newVal
-          this.handleSearchEvent(this.productListParams)
-        }
     }
-  },
-  components: {
-    Popup
   }
 };
 </script>
@@ -713,12 +380,14 @@ export default {
     width: 100px !important;
   }
   .el-form >>> .el-form-item__content {
-    margin-left: 100px !important;
+    margin-left: 0 !important;
+    width: calc(100% - 100px);
+    display: grid;
   }
   .el-form-item {
-    margin-bottom: 22px;
+    margin-bottom: 3px;
     width: 25%;
-    display: inline-block;
+    display: -webkit-inline-box;
   }
   .middle-form {
     padding: 10px;
@@ -726,6 +395,8 @@ export default {
   }
   .bottom-form {
     flex: 1;
+    display: flex;
+    flex-direction: column;
     overflow: auto;
   }
   .cell > .el-button--text {
@@ -737,32 +408,25 @@ export default {
   .el-date-editor.el-input, .el-date-editor.el-input__inner {
     width: 100%;
   }
-  ::v-deep .el-dialog {
-    width: 80%;
-    background: #3892d3;
-    height: 80vh;
+  span {
+    width: 100%;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+  .bottom-form >>> .el-tabs {
     display: flex;
+    flex: 1;
     flex-direction: column;
   }
-  ::v-deep .el-dialog__title, ::v-deep .el-dialog__close {
-    color: #fff;
+  .bottom-form >>> .el-tabs__nav-wrap {
+    background-color: #dfeaf2;
   }
-  ::v-deep .dialog-title {
-    color: #fff;
+  .bottom-form >>> .el-tabs__content {
+    flex: 1;
   }
-  ::v-deep .el-dialog__body {
-    padding: 10px;
-    height: calc(100% - 55px);
-  }
-  ::v-deep .el-dialog__headerbtn:focus .el-dialog__close, ::v-deep .el-dialog__headerbtn:hover .el-dialog__close {
-    color: #f00 !important;
-  }
-  ::v-deep .product .el-input__inner {
-    border: none;
-    background: none;
-  }
-  .activeBorder {
-    border: #ff5722 solid 0.5px;
-    border-radius: 5%;
+  .bottom-form >>> #pane-first,#pane-second,#pane-third,#pane-fourth {
+    height: 100%;
   }
 </style>
