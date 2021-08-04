@@ -171,6 +171,8 @@
       <el-table
         :data="form.stockinDetailsList"
         stripe
+        :summary-method="getSummaries"
+        show-summary
         :header-cell-style="headerStyle"
         height="100%">
         <el-table-column label="删除" fixed width="100" align="center">
@@ -405,6 +407,7 @@ export default {
         this.loading = false
         this.reset()
         Object.assign(this.form, response.data)
+        this.calcHeight()
       }, error => {
         this.loading = false
       })
@@ -628,7 +631,7 @@ export default {
     },
     handleConfirmEvent(data) {
       // 选择完成后，新增到产品列表
-      console.log(JSON.stringify(this.form.yqPurchaseOrderDetailList))
+      console.log(JSON.stringify(this.form.stockinDetailsList))
       if(data.length >0) {
         for(let val of data) {
           console.log(JSON.stringify(val))
@@ -652,7 +655,7 @@ export default {
           temp.fcateid = val.fcateid
           temp.fmemo = null
           temp.fbspec = val.productSpec
-          this.form.yqPurchaseOrderDetailList.push(temp)
+          this.form.stockinDetailsList.push(temp)
         }
       }
       this.open = false
@@ -693,6 +696,45 @@ export default {
     },
     headerStyle() {
       return "text-align: center;border: 1px solid #ccc;"
+    },
+    getSummaries(param) {
+      // console.log(JSON.stringify(param))
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计';
+          return;
+        }
+        if (index === 6 || index === 7 || index === 8 || index === 9) {
+          const values = data.map(item => Number(item[column.property]));
+          if (!values.every(value => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0);
+          }
+        }
+      });
+      return sums;
+    },
+    calcHeight() {
+      console.log("ssssssssssssss")
+      
+      //必须加延时，要不然赋不上去值
+      setTimeout(() => {
+        //通过原生方法，获取dom节点的高度------获取element-ui table表格header的元素
+        let header = (window.document.getElementsByClassName('el-table__fixed-header-wrapper'))[0]
+        console.log(header)
+        //通过原生方法，获取dom节点的高度------获取element-ui table表格body的元素
+        let body = (window.document.getElementsByClassName('el-table__fixed-body-wrapper'))[0]
+        console.log(body)
+        body.style.top = (header.clientHeight) + 'px';
+      }, 500)
     }
   },
   computed: {
@@ -707,11 +749,12 @@ export default {
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
           this.$route.meta.title = this.title = '编辑采购入库单'
-          this.getOrderDetail(this.keyid);
+          this.getStockinDetail(this.keyid);
         }else {
           this.$route.meta.title = this.title = '添加采购入库单'
           this.getBillNumber();
         }
+        // this.calcHeight()
         const visitedViews = this.$store.state.tagsView.visitedViews
         for(let item of visitedViews) {
           if(item.path == this.$route.path) {
@@ -793,7 +836,23 @@ export default {
     background: none;
   }
   .activeBorder {
-    border: #ff5722 solid 0.5px;
+    border: #ff5722 solid 1px;
     border-radius: 5%;
   }
+  .bottom-form >>> .el-table__footer-wrapper {
+    position: absolute;
+    bottom: 0;
+  }
+  .bottom-form >>> .el-table__body-wrapper {
+    overflow: auto;
+  }
+  .bottom-form >>> .el-table__fixed-footer-wrapper tbody td {
+    color: red !important;
+  }
+  .bottom-form >>> .el-table__footer-wrapper .cell {
+    color: red !important;
+  }
+  /* ::v-deep .el-table__fixed-body-wrapper {
+    top: 45px !important;
+  } */
 </style>
