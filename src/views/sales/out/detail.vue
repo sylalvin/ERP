@@ -136,6 +136,8 @@
       <el-table
         :data="form.stockOutDetailsList"
         stripe
+        :summary-method="getSummaries"
+        show-summary
         :header-cell-style="headerStyle"
         height="100%">
         <el-table-column label="删除" fixed width="100" align="center">
@@ -642,6 +644,31 @@ export default {
     },
     headerStyle() {
       return "text-align: center;border: 1px solid #ccc;"
+    },
+    getSummaries(param) {
+      // console.log(JSON.stringify(param))
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计';
+          return;
+        }
+        if (index === 6) {
+          const values = data.map(item => Number(item[column.property]));
+          if (!values.every(value => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0);
+          }
+        }
+      });
+      return sums;
     }
   },
   computed: {
@@ -744,5 +771,18 @@ export default {
   .activeBorder {
     border: #ff5722 solid 0.5px;
     border-radius: 5%;
+  }
+  .bottom-form >>> .el-table__footer-wrapper {
+    position: absolute;
+    bottom: 0;
+  }
+  .bottom-form >>> .el-table__body-wrapper {
+    overflow: auto;
+  }
+  .bottom-form >>> .el-table__fixed-footer-wrapper tbody td {
+    color: red !important;
+  }
+  .bottom-form >>> .el-table__footer-wrapper .cell {
+    color: red !important;
   }
 </style>
