@@ -110,7 +110,7 @@
       </el-col>
     </el-row>
 
-    <el-table height="100%" v-loading="loading" :data="outList" @selection-change="handleSelectionChange" fit>
+    <el-table height="100%" v-loading="loading" :data="outList" @selection-change="handleSelectionChange" border resizable>
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="单据号" align="center" prop="keyid">
         <template v-slot="scope">
