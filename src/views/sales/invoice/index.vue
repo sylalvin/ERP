@@ -26,13 +26,13 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="供应商代码" prop="fcode">
-        <el-select v-model="queryParams.fcode" placeholder="请选择供应商代码" clearable size="small" filterable remote :remote-method="getSupplierListByCode">
+      <el-form-item label="客户代码" prop="fcode">
+        <el-select v-model="queryParams.fcode" placeholder="请选择客户代码" clearable size="small" filterable remote :remote-method="getSupplierListByCode">
           <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
         </el-select>
       </el-form-item>
-      <el-form-item label="供应商名称" prop="fname">
-        <el-select v-model="queryParams.fname" placeholder="请选择供应商名称" clearable size="small" filterable remote :remote-method="getSupplierListByName">
+      <el-form-item label="客户名称" prop="fname">
+        <el-select v-model="queryParams.fname" placeholder="请选择客户名称" clearable size="small" filterable remote :remote-method="getSupplierListByName">
           <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
         </el-select>
       </el-form-item>
@@ -40,14 +40,6 @@
         <el-select v-model="queryParams.fdistributionpoint" placeholder="请选择作业区" size="small">
           <el-option v-for="(item, index) in fdistributionpointList" :key="index" :label="item.fkey" :value="item.fvalue" />
         </el-select>
-      </el-form-item>
-      <el-form-item label="单据状态" prop="fstatus">
-        <el-select v-model="queryParams.fstatus" placeholder="请选择单据状态" size="small">
-          <el-option v-for="(item, index) in billDictList" :key="index" :label="item.fkey" :value="item.fvalue" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="所有未配送订单：" prop="nosend" class="nosend">
-        <el-checkbox v-model="queryParams.nosend"></el-checkbox>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
@@ -119,19 +111,22 @@
       </el-table-column>
       <el-table-column label="作废标识" align="center" prop="fdeleteflag" />
       <el-table-column label="单据状态" align="center" prop="fstatus" />
-      <el-table-column label="审核状态" align="center" prop="fauditflag" />
-      <el-table-column label="订单类型" align="center" prop="ftype" />
+      <el-table-column label="上传" align="center" prop="ft6status" />
       <el-table-column label="作业区" align="center" prop="fdistributionpoint" />
       <el-table-column label="配送日期" align="center" prop="fdate" />
-      <el-table-column label="客户代码" align="center" prop="fcode" />
       <el-table-column label="客户名称" align="center" prop="fname" />
       <el-table-column label="配送方式" align="center" prop="fdeliverymethod" />
       <el-table-column label="车牌号" align="center" prop="fvehiclenum" />
       <el-table-column label="送货司机" align="center" prop="fdriver" />
       <el-table-column label="押运员" align="center" prop="fsupercargo" />
       <el-table-column label="发货人" align="center" prop="fshipper" />
-      <el-table-column label="制单人" align="center" prop="createby" />
-      <el-table-column label="更新时间" align="center" prop="fupdatedate" width="180">
+      <el-table-column label="收货人" align="center" prop="flinkman" />
+      <el-table-column label="操作员" align="center" prop="createby" />
+      <el-table-column label="业务员" align="center" prop="fsalesman" />
+      <el-table-column label="备注" align="center" prop="fmemo" />
+      <el-table-column label="收入容器编号" align="center" prop="fbottleincode" />
+      <el-table-column label="发出容器编号" align="center" prop="fbottleoutcode" />
+      <el-table-column label="操作时间" align="center" prop="fupdatedate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.fupdatedate, '{y}-{m}-{d}') }}</span>
         </template>
@@ -188,9 +183,7 @@ export default {
         fname: null,
         fdistributionpoint: null,
         beginDate: null,
-        endDate: null,
-        fstatus: null,
-        nosend: false
+        endDate: null
       },
       supplierListNameParams: { // 通过Name查询供应商参数
         pageNum: 1,
@@ -305,25 +298,25 @@ export default {
     handleUpdate(row) {
       const keyid = row.keyid || this.ids
       const route = {
-        name: "SalesDetail",
-        path: "/sales/out/detail",
+        name: "InvoiceDetail",
+        path: "/sales/invoice/detail",
         query: {
           keyid: keyid
         }
       }
       Object.assign(route, {
-        meta: { title: '编辑销售订单' }
+        meta: { title: '编辑发货单' }
       })
       this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
     },
     /** 新增按钮操作 */
     handleAdd() {
       const route = {
-        name: "SalesDetail",
-        path: "/sales/out/detail",
+        name: "InvoiceDetail",
+        path: "/sales/invoice/detail",
       }
       Object.assign(route, {
-        meta: { title: '添加销售订单' }
+        meta: { title: '添加发货单' }
       })
       this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
     },

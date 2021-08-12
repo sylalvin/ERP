@@ -305,7 +305,7 @@ export default {
     handleUpdate(row) {
       const keyid = row.keyid || this.ids
       const route = {
-        name: "SalesDetail",
+        name: "OutDetail",
         path: "/sales/out/detail",
         query: {
           keyid: keyid
@@ -319,7 +319,7 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       const route = {
-        name: "SalesDetail",
+        name: "OutDetail",
         path: "/sales/out/detail",
       }
       Object.assign(route, {
