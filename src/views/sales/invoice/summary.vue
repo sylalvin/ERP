@@ -17,13 +17,6 @@
               value-format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="订单号" prop="keyid">
-            <el-input
-              v-model="queryParams.keyid"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item> 
           <el-form-item label="客户代码" prop="fcode">
             <el-input
               v-model="queryParams.fcode"
@@ -50,6 +43,12 @@
               v-model="queryParams.itemname"
               clearable
               @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+          <el-form-item label="业务员" prop="fsalesman">
+            <el-input
+              v-model="queryParams.fsalesman"
+              clearable
             />
           </el-form-item>
         </el-form>
@@ -96,21 +95,15 @@
         </el-row>
         <el-table height="100%" v-loading="loading" :data="orderList" class="table" resizable border>
           <!-- <el-table-column type="selection" align="center" /> -->
-          <el-table-column label="日期" align="center" prop="fdate" />
-          <el-table-column label="作业区" align="center" prop="fdistributionpoint" />
-          <el-table-column label="订单类型" align="center" prop="ft6billstatus" />
-          <el-table-column label="订单号" align="center" prop="keyid" />
-          <el-table-column label="客户代码" align="center" prop="fcode" />
           <el-table-column label="客户名称" align="center" prop="fname" />
           <el-table-column label="商品名称" align="center" prop="fitemname" />
+          <el-table-column label="规格" align="center" prop="fspec" />
+          <el-table-column label="单位" align="center" prop="funit" />
           <el-table-column label="数量" align="center" prop="fqty" />
-          <el-table-column label="包装物编码" align="center" prop="fbottle" />
-          <el-table-column label="包装物" align="center" prop="fbottlename" />
-          <el-table-column label="实瓶数量" align="center" prop="fbottleqty" />
+          <el-table-column label="单价" align="center" prop="fprice" />
+          <el-table-column label="金额" align="center" prop="famount" />
+          <el-table-column label="业务员" align="center" prop="fsalesman" />
           <el-table-column label="备注" align="center" prop="fmemo" />
-          <el-table-column label="商品代码T6" align="center" prop="finum" />
-          <el-table-column label="商品代码" align="center" prop="fitemcode" />
-          <el-table-column label="所属区域" align="center" prop="farea" />
         </el-table>
       </div>
     </div>
@@ -135,10 +128,10 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 20,
+        pageSize: 100,
         fcode: null,
         fname: null,
-        keyid: null,
+        fsalesman: null,
         begindate: null,
         enddate: null,
         itemcode: null,

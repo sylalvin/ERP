@@ -130,7 +130,7 @@
             :on-change="handleChange"
             :show-file-list="false"
             :file-list="fileList">
-            <el-button size="small" type="primary">
+            <el-button size="small" type="primary" class="upload-button">
               <template v-if="fileList.length > 0">{{ fileList[0].name }}</template>
               <template v-else>点击上传文件</template>
             </el-button>
@@ -168,6 +168,24 @@
             icon="el-icon-close"
             size="mini"
             @click="handleClose"
+          >复制上次订单</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="info"
+            plain
+            icon="el-icon-close"
+            size="mini"
+            @click="handleClose"
+          >打印</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="info"
+            plain
+            icon="el-icon-close"
+            size="mini"
+            @click="handleClose"
           >关闭</el-button>
         </el-col>
       </el-row>
@@ -176,6 +194,7 @@
       <el-table
         :data="form.stockOutDetailsList"
         stripe
+        resizable border
         :summary-method="getSummaries"
         show-summary
         :header-cell-style="headerStyle"
@@ -190,12 +209,12 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="fitemcode"
-          label="编码">
+          prop="ft6warehouse"
+          label="仓库">
         </el-table-column>
         <el-table-column
           prop="fitemname"
-          label="品名">
+          label="名称">
         </el-table-column>
         <el-table-column
           prop="fspec"
@@ -206,21 +225,8 @@
           label="单位">
         </el-table-column>
         <el-table-column
-          prop="fprice"
-          label="单价">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fprice')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fprice')"
-              @blur="handleBlur"
-              v-model="scope.row.fprice" />
-          </template>
-        </el-table-column>
-        <el-table-column
           prop="fqty"
-          label="数量">
+          label="商品发出数">
           <template v-slot="scope">
             <el-input
               type="number"
@@ -232,16 +238,94 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="remark"
-          label="备注说明">
+          prop="fbottleqty"
+          label="容器发出数">
           <template v-slot="scope">
             <el-input
-              type="text"
+              type="number"
               class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'remark')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'remark')"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottleqty')"
               @blur="handleBlur"
-              v-model="scope.row.remark" />
+              v-model="scope.row.fbottleqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fbottleoutcode"
+          label="发出容器编号">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleoutcode')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottleoutcode')"
+              @blur="handleBlur"
+              v-model="scope.row.fbottleoutcode" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="freturnqty"
+          label="商品退货数">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'freturnqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'freturnqty')"
+              @blur="handleBlur"
+              v-model="scope.row.freturnqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="frecycleqty"
+          label="容器收入数">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'frecycleqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'frecycleqty')"
+              @blur="handleBlur"
+              v-model="scope.row.frecycleqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fbottleincode"
+          label="收入容器编号">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleincode')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottleincode')"
+              @blur="handleBlur"
+              v-model="scope.row.fbottleincode" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="femptybottle"
+          label="空瓶数">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'femptybottle')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'femptybottle')"
+              @blur="handleBlur"
+              v-model="scope.row.femptybottle" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fbottlename"
+          label="包装物">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottlename')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottlename')"
+              @blur="handleBlur"
+              v-model="scope.row.fbottlename" />
           </template>
         </el-table-column>
         <el-table-column
@@ -249,11 +333,25 @@
           label="订单号码">
           <template v-slot="scope">
             <el-input
+              type="number"
               class="product"
               :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fnum')}"
               @focus="handleFocus(scope.row.fid + '-' + 'fnum')"
               @blur="handleBlur"
               v-model="scope.row.fnum" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fmemo"
+          label="备注说明">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fmemo')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fmemo')"
+              @blur="handleBlur"
+              v-model="scope.row.fmemo" />
           </template>
         </el-table-column>
       </el-table>
@@ -712,7 +810,7 @@ export default {
           sums[index] = '合计';
           return;
         }
-        if (index === 6) {
+        if (index === 5 || index === 6 || index === 8 || index === 9 || index === 11) {
           const values = data.map(item => Number(item[column.property]));
           if (!values.every(value => isNaN(value))) {
             sums[index] = values.reduce((prev, curr) => {
@@ -849,11 +947,11 @@ export default {
   .upload >>> .el-upload {
     max-width: 100% !important;
   }
-  .el-button {
+  .upload-button {
     max-width: 100%;
     text-overflow: ellipsis;
   }
-  .el-button >>> span {
+  .upload-button >>> span {
     max-width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;

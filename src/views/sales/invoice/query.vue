@@ -17,7 +17,12 @@
               value-format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="订单号" prop="keyid">
+          <el-form-item label="作业区" prop="fdistributionpoint">
+            <el-select v-model="queryParams.fdistributionpoint" placeholder="请选择作业区" size="small">
+              <el-option v-for="(item, index) in fdistributionpointList" :key="index" :label="item.fkey" :value="item.fvalue" />
+            </el-select>
+          </el-form-item> 
+          <el-form-item label="单据号" prop="keyid">
             <el-input
               v-model="queryParams.keyid"
               clearable
@@ -97,20 +102,29 @@
         <el-table height="100%" v-loading="loading" :data="orderList" class="table" resizable border>
           <!-- <el-table-column type="selection" align="center" /> -->
           <el-table-column label="日期" align="center" prop="fdate" />
+          <el-table-column label="单据号" align="center" prop="keyid" />
+          <el-table-column label="同步" align="center" prop="ft6status" />
           <el-table-column label="作业区" align="center" prop="fdistributionpoint" />
-          <el-table-column label="订单类型" align="center" prop="ft6billstatus" />
-          <el-table-column label="订单号" align="center" prop="keyid" />
-          <el-table-column label="客户代码" align="center" prop="fcode" />
           <el-table-column label="客户名称" align="center" prop="fname" />
+          <el-table-column label="商品编码" align="center" prop="fitemcode" />
           <el-table-column label="商品名称" align="center" prop="fitemname" />
-          <el-table-column label="数量" align="center" prop="fqty" />
-          <el-table-column label="包装物编码" align="center" prop="fbottle" />
+          <el-table-column label="规格" align="center" prop="fspec" />
+          <el-table-column label="商品发出数" align="center" prop="fqty" />
+          <el-table-column label="容器发出数" align="center" prop="fbottleqty" />
+          <el-table-column label="发出容器编号" align="center" prop="fbottleoutcode" />
+          <el-table-column label="商品收入数" align="center" prop="freturnqty" />
+          <el-table-column label="容器收入数量" align="center" prop="frecycleqty" />
+          <el-table-column label="收入容器编号" align="center" prop="fbottleincode" />
           <el-table-column label="包装物" align="center" prop="fbottlename" />
-          <el-table-column label="实瓶数量" align="center" prop="fbottleqty" />
+          <el-table-column label="存货代码" align="center" prop="finum" />
+          <el-table-column label="计量单位" align="center" prop="funit" />
+          <el-table-column label="司机" align="center" prop="fdriver" />
+          <el-table-column label="押运员" align="center" prop="fsupercargo" />
+          <el-table-column label="车牌号" align="center" prop="fvehiclenum" />
+          <el-table-column label="销售订单" align="center" prop="flogisticsnumber" />
+          <el-table-column label="配送单号" align="center" prop="fdispatchnum" />
           <el-table-column label="备注" align="center" prop="fmemo" />
-          <el-table-column label="商品代码T6" align="center" prop="finum" />
-          <el-table-column label="商品代码" align="center" prop="fitemcode" />
-          <el-table-column label="所属区域" align="center" prop="farea" />
+          <el-table-column label="摘要" align="center" prop="omemo" />
         </el-table>
       </div>
     </div>
@@ -119,6 +133,7 @@
 
 <script>
 import { listOut } from "@/api/sales/out";
+import { listItem } from "@/api/system/businessDictItem";
 
 export default {
   name: "InvoiceQuery",
@@ -138,12 +153,14 @@ export default {
         pageSize: 20,
         fcode: null,
         fname: null,
+        fdistributionpoint: null,
         keyid: null,
         begindate: null,
         enddate: null,
         itemcode: null,
         itemname: null
-      }
+      },
+      fdistributionpointList: []
     };
   },
   created() {
@@ -153,6 +170,7 @@ export default {
 	  d = d < 10 ? "0" + d : d;
     this.queryParams.begindate = this.queryParams.enddate = y + '-' + m + '-' + d
     this.getList()
+    this.getDictList()
   },
   methods: {
     /** 查询销售订单列表 */
@@ -217,6 +235,16 @@ export default {
         }
       }
     },
+    getDictList() {
+      // 获取作业区
+      listItem({
+        pageNum: 1,
+        pageSize: 20,
+        fsparent: 1026
+      }).then(response => {
+        this.fdistributionpointList = response.rows
+      })
+    }
   }
 };
 </script>
@@ -249,7 +277,7 @@ export default {
   }
   .container-left {
     width: 200px;
-    overflow: scroll !important;
+    overflow: auto;
     border: #ccc 1px solid;
     padding: 5px;
   }

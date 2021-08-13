@@ -249,7 +249,7 @@ export default {
   }
   .container-left {
     width: 200px;
-    overflow: scroll !important;
+    overflow: auto;
     border: #ccc 1px solid;
     padding: 5px;
   }
