@@ -20,7 +20,7 @@ import ParentView from '@/components/ParentView';
  * meta : {
     noCache: true                // 如果设置为true，则不会被 <keep-alive> 缓存(默认 false)
     title: 'title'               // 设置该路由在侧边栏和面包屑中展示的名字
-    icon: 'svg-name'             // 设置该路由的图标，对应路径src/assets/icons/svg
+    icon: 'svg-name'             // 设置该路由的图标，对应路径srchttp://kamome-d.jp/assets/icons/svg
     breadcrumb: false            // 如果设置为false，则不会在breadcrumb面包屑中显示
   }
  */
@@ -131,41 +131,10 @@ export const constantRoutes = [
         name: "OrderDetail"
       },
       {
-        path: '/purchase/stockin/edit',
-        component: (resolve) => require(['@/views/purchase/stockin/edit'], resolve),
-        hidden: true,
-        name: "StockinEdit"
-      },
-      {
         path: '/purchase/stockin/detail',
         component: (resolve) => require(['@/views/purchase/stockin/detail'], resolve),
         hidden: true,
         name: "StockinDetail"
-      }
-    ]
-  },
-  {
-    path: '/sales',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: '/sales/out/detail',
-        component: (resolve) => require(['@/views/sales/out/detail'], resolve),
-        hidden: true,
-        name: "SalesDetail"
-      },
-      {
-        path: '/sales/invoice/detail',
-        component: (resolve) => require(['@/views/sales/invoice/detail'], resolve),
-        hidden: true,
-        name: "InvoiceDetail"
-      },
-      {
-        path: '/sales/salesPlanLogic/detail',
-        component: (resolve) => require(['@/views/sales/salesPlanLogic/detail'], resolve),
-        hidden: true,
-        name: "SalesPlanLogicDetail"
       }
     ]
   },
