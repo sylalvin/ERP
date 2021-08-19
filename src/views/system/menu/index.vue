@@ -21,71 +21,66 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button class="btn" icon="el-icon-refresh" size="small" plain @click="resetQuery">重置</el-button>
+        <el-button class="btn" type="success" size="small" plain icon="el-icon-plus" @click="handleAdd" v-hasPermi="['system:menu:add']">新增</el-button>
+        <el-button class="btn" type="primary" size="small" plain icon="el-icon-search" @click="handleQuery">搜索</el-button>
       </el-form-item>
     </el-form>
 
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:menu:add']"
-        >新增</el-button>
-      </el-col>
+    <!-- <el-row :gutter="10" class="mb8">
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+    </el-row> -->
+    <div class="container-bottom">
+      <el-table
+        height="100%"
+        class="table"
+        v-loading="loading"
+        :data="menuList"
+        row-key="menuId"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+      >
+        <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" width="160"></el-table-column>
+        <el-table-column prop="icon" label="图标" align="center" width="100">
+          <template slot-scope="scope">
+            <svg-icon :icon-class="scope.row.icon" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
+        <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
+        <el-table-column label="创建时间" align="center" prop="createTime">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.createTime) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button size="mini" 
+              type="text" 
+              icon="el-icon-edit" 
+              @click="handleUpdate(scope.row)"
+              v-hasPermi="['system:menu:edit']"
+            >修改</el-button>
+            <el-button 
+              size="mini" 
+              type="text" 
+              icon="el-icon-plus" 
+              @click="handleAdd(scope.row)"
+              v-hasPermi="['system:menu:add']"
+            >新增</el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+              v-hasPermi="['system:menu:remove']"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <el-table
-      v-loading="loading"
-      :data="menuList"
-      row-key="menuId"
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-    >
-      <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" width="160"></el-table-column>
-      <el-table-column prop="icon" label="图标" align="center" width="100">
-        <template slot-scope="scope">
-          <svg-icon :icon-class="scope.row.icon" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
-      <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button size="mini" 
-            type="text" 
-            icon="el-icon-edit" 
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:menu:edit']"
-          >修改</el-button>
-          <el-button 
-            size="mini" 
-            type="text" 
-            icon="el-icon-plus" 
-            @click="handleAdd(scope.row)"
-            v-hasPermi="['system:menu:add']"
-          >新增</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:menu:remove']"
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    </div>
 
     <!-- 添加或修改菜单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
@@ -398,3 +393,41 @@ export default {
   }
 };
 </script>
+<style scoped>
+  .app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+  }
+  .container-bottom {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  .el-form {
+    padding: 10px;
+  }
+  .el-form-item {
+    margin-bottom: 5px;
+  }
+  .mb8 {
+    padding-left: 10px;
+  }
+  .table {
+    flex: 1;
+  }
+  .pagination-container {
+    margin: 0;
+    padding: 0 !important;
+    height: 50px;
+  }
+  .btn {
+    height: 32px;
+  }
+</style>

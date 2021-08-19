@@ -139,6 +139,31 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/sales',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/sales/invoice/detail',
+        component: (resolve) => require(['@/views/sales/invoice/detail'], resolve),
+        hidden: true,
+        name: "InvoiceDetail"
+      },
+      {
+        path: '/sales/out/detail',
+        component: (resolve) => require(['@/views/sales/out/detail'], resolve),
+        hidden: true,
+        name: "OutDetail"
+      },
+      {
+        path: '/sales/salesPlanLogic/detail',
+        component: (resolve) => require(['@/views/sales/salesPlanLogic/detail'], resolve),
+        hidden: true,
+        name: "SalesPlanLogicDetail"
+      }
+    ]
+  },
+  {
     path: '/gen',
     component: Layout,
     hidden: true,

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="top-form">
-      <!-- 添加或修改发货表单 -->
+      <!-- 添加或修改复核发货表单 -->
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="单据编号" prop="keyid">
           <el-input v-model="form.keyid" disabled />
@@ -468,15 +468,6 @@ export default {
       this.fileList = fileList
       console.log(JSON.stringify(this.fileList))
     },
-    /** 获取单据号 */
-    getBillNumber() {
-      getBill({
-        prefix: 'TM'
-      }).then(response => {
-        this.reset()
-        this.form.keyid = response.data
-      })
-    },
     /** 查询发货单单详情 */
     getOutDetail(keyid) {
       getOut(keyid).then(response => {
@@ -565,11 +556,6 @@ export default {
       listSupplier(this.supplierListCodeParams).then(response => {
         this.supplierListCode = response.rows;
       });
-    },
-    // 取消按钮
-    cancel() {
-      this.open = false;
-      this.reset();
     },
     // 表单重置
     reset() {
@@ -835,13 +821,14 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/sales/invoice/detail') return
+        // 路由判断待定
+        if((val.path != '/sales/reviewInvoice/detail') && (val.path != '/sales/invoice/detail')) return
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '编辑销售订单'
+          this.$route.meta.title = this.title = '复核发货单详情'
           this.getOrderDetail(this.keyid);
         }else {
-          this.$route.meta.title = this.title = '添加销售订单'
+          this.$route.meta.title = this.title = '新增发货单'
           this.getBillNumber();
         }
         const visitedViews = this.$store.state.tagsView.visitedViews
