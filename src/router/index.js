@@ -135,6 +135,12 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/purchase/stockin/detail'], resolve),
         hidden: true,
         name: "StockinDetail"
+      },
+      {
+        path: '/purchase/reviewOrder/detail',
+        component: (resolve) => require(['@/views/purchase/reviewOrder/detail'], resolve),
+        hidden: true,
+        name: "ReviewOrderDetail"
       }
     ]
   },
@@ -160,6 +166,12 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/sales/salesPlanLogic/detail'], resolve),
         hidden: true,
         name: "SalesPlanLogicDetail"
+      },
+      {
+        path: '/sales/planToSales/detail',
+        component: (resolve) => require(['@/views/sales/planToSales/detail'], resolve),
+        hidden: true,
+        name: "PlanToSalesDetail"
       }
     ]
   },
