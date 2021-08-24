@@ -3,16 +3,16 @@
     <div class="d-flex">
       <div class="container-left">
         <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-          <el-form-item label="开始日期" prop="begindate">
+          <el-form-item label="开始日期" prop="beginDate">
             <el-date-picker clearable
-              v-model="queryParams.begindate"
+              v-model="queryParams.beginDate"
               type="date"
               value-format="yyyy-MM-dd">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="结束日期" prop="enddate">
+          <el-form-item label="结束日期" prop="endDate">
             <el-date-picker clearable
-              v-model="queryParams.enddate"
+              v-model="queryParams.endDate"
               type="date"
               value-format="yyyy-MM-dd">
             </el-date-picker>
@@ -152,8 +152,8 @@ export default {
         fcode: null,
         fclass: null,
         keyid: null,
-        begindate: null,
-        enddate: null,
+        beginDate: null,
+        endDate: null,
         itemcode: null,
         itemname: null,
         fvehiclenum: null
@@ -167,7 +167,7 @@ export default {
     let [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()]
     m = m < 10 ? "0" + m : m;
 	  d = d < 10 ? "0" + d : d;
-    this.queryParams.begindate = this.queryParams.enddate = y + '-' + m + '-' + d
+    this.queryParams.beginDate = this.queryParams.endDate = y + '-' + m + '-' + d
     this.getList()
     this.getDictList()
   },

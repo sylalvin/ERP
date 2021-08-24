@@ -205,6 +205,11 @@ export default {
     };
   },
   created() {
+    let date = new Date()
+    let [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+    m = m < 10 ? "0" + m : m;
+	  d = d < 10 ? "0" + d : d;
+    this.queryParams.beginDate = this.queryParams.endDate = y + '-' + m + '-' + d
     this.getList();
     this.getDictList();
   },

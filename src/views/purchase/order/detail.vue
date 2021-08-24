@@ -14,18 +14,18 @@
             placeholder="选择配送日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="供应商代码" prop="fcode">
-          <el-select v-model="form.fcode" placeholder="请选择供应商代码" clearable filterable remote :remote-method="getSupplierListByCode">
+        <el-form-item label="客户代码" prop="fcode">
+          <el-select v-model="form.fcode" placeholder="请选择客户代码" clearable filterable remote :remote-method="getSupplierListByCode">
             <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商名称" prop="fname">
-          <el-select v-model="form.fname" placeholder="请选择供应商名称" clearable filterable remote :remote-method="getSupplierListByName">
+        <el-form-item label="客户名称" prop="fname">
+          <el-select v-model="form.fname" placeholder="请选择客户名称" clearable filterable remote :remote-method="getSupplierListByName">
           <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商地址" prop="faddress">
-          <el-input v-model="form.faddress" placeholder="请输入供应商地址" />
+        <el-form-item label="客户地址" prop="faddress">
+          <el-input v-model="form.faddress" placeholder="请输入客户地址" />
         </el-form-item>
         <el-form-item label="电话" prop="fphone">
           <el-input v-model="form.fphone" placeholder="请输入电话" />

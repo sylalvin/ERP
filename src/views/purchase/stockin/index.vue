@@ -1,49 +1,65 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" class="search-form">
-      <el-form-item label="开始日期"  prop="beginDate">
-        <el-date-picker clearable size="small"
-          v-model="queryParams.beginDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择开始日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="结束日期" prop="endDate">
-        <el-date-picker clearable size="small"
-          v-model="queryParams.endDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择结束日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="单据编号" prop="keyid">
-        <el-input
-          v-model="queryParams.keyid"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="客户代码" prop="fcode">
-        <el-select v-model="queryParams.fcode" placeholder="请选择客户代码" clearable size="small" filterable remote :remote-method="getSupplierListByCode">
-          <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="客户名称" prop="fname">
-        <el-select v-model="queryParams.fname" placeholder="请选择客户名称" clearable size="small" filterable remote :remote-method="getSupplierListByName">
-          <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="单据状态" prop="fstatus">
-        <el-select v-model="queryParams.fstatus" placeholder="请选择单据状态" size="small">
-          <el-option v-for="(item, index) in billDictList" :key="index" :label="item.fkey" :value="item.fvalue" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
+      <el-row :gutter="10">
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item label="开始日期"  prop="beginDate">
+            <el-date-picker clearable size="small"
+              v-model="queryParams.beginDate"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择开始日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item label="结束日期" prop="endDate">
+            <el-date-picker clearable size="small"
+              v-model="queryParams.endDate"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择结束日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item label="单据编号" prop="keyid">
+            <el-input
+              v-model="queryParams.keyid"
+              clearable
+              size="small"
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item label="客户代码" prop="fcode">
+            <el-select v-model="queryParams.fcode" placeholder="请选择客户代码" clearable size="small" filterable remote :remote-method="getSupplierListByCode">
+              <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item label="客户名称" prop="fname">
+            <el-select v-model="queryParams.fname" placeholder="请选择客户名称" clearable size="small" filterable remote :remote-method="getSupplierListByName">
+              <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item label="单据状态" prop="fstatus">
+            <el-select v-model="queryParams.fstatus" placeholder="请选择单据状态" size="small">
+              <el-option v-for="(item, index) in billDictList" :key="index" :label="item.fkey" :value="item.fvalue" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6">
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -190,6 +206,11 @@ export default {
     };
   },
   created() {
+    let date = new Date()
+    let [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+    m = m < 10 ? "0" + m : m;
+	  d = d < 10 ? "0" + d : d;
+    this.queryParams.beginDate = this.queryParams.endDate = y + '-' + m + '-' + d
     this.getList();
   },
   methods: {
@@ -371,5 +392,8 @@ export default {
   }
   .search-form >>> .el-form-item__content{
     margin-left: 10px !important;
+  }
+  .el-form-item {
+    margin-bottom: 5px;
   }
 </style>
