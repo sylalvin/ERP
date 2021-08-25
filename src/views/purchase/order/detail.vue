@@ -6,6 +6,9 @@
         <el-form-item label="单据编号" prop="keyid">
           <el-input v-model="form.keyid" disabled />
         </el-form-item>
+        <el-form-item label="制单人" prop="createby">
+          <el-input v-model="form.createby" disabled />
+        </el-form-item>
         <el-form-item label="配送日期" prop="fdate">
           <el-date-picker clearable
             v-model="form.fdate"
@@ -14,13 +17,16 @@
             placeholder="选择配送日期">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="对账单号" prop="freconciliation">
+          <el-input v-model="form.freconciliation" />
+        </el-form-item>
         <el-form-item label="客户代码" prop="fcode">
-          <el-select v-model="form.fcode" placeholder="请选择客户代码" clearable filterable remote :remote-method="getSupplierListByCode">
+          <el-select v-model="form.fcode" placeholder="请选择客户代码"  @change="handleSelectFCode" clearable filterable remote :remote-method="getSupplierListByCode">
             <el-option v-for="(item, index) in supplierListCode" :key="index" :label="item.fcode" :value="item.fcode" />
           </el-select>
         </el-form-item>
         <el-form-item label="客户名称" prop="fname">
-          <el-select v-model="form.fname" placeholder="请选择客户名称" clearable filterable remote :remote-method="getSupplierListByName">
+          <el-select v-model="form.fname" placeholder="请选择客户名称" @change="handleSelectFName" clearable filterable remote :remote-method="getSupplierListByName">
           <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
           </el-select>
         </el-form-item>
@@ -33,17 +39,15 @@
         <el-form-item label="联系人" prop="flinkman">
           <el-input v-model="form.flinkman" placeholder="请输入联系人" />
         </el-form-item>
+        <el-form-item label="运输服务费" prop="ffreight">
+          <el-input v-model="form.ffreight" placeholder="请输入运输服务费" />
+        </el-form-item>
         <el-form-item label="车牌号" prop="fvehiclenum">
           <el-select v-model="form.fvehiclenum" placeholder="请选择车牌号">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
-        <el-form-item label="配送方式" prop="fdeliverymethod">
-          <el-select v-model="form.fdeliverymethod" placeholder="请选择配送方式">
-            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="司机" prop="fdriver">
+        <el-form-item label="送货司机" prop="fdriver">
           <el-select v-model="form.fdriver" placeholder="请选择司机">
             <el-option v-for="(item, index) in driverList" :key="index" :label="item.userName" :value="item.userId" />
           </el-select>
@@ -52,17 +56,6 @@
           <el-select v-model="form.fsupercargo" placeholder="请选择押运员">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="业务员" prop="fsalesman">
-          <el-select v-model="form.fsalesman" placeholder="请选择业务员">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="fmemo">
-          <el-input v-model="form.fmemo" placeholder="请输入备注" />
-        </el-form-item>
-        <el-form-item label="运输服务费" prop="ffreight">
-          <el-input v-model="form.ffreight" placeholder="请输入运输服务费" />
         </el-form-item>
         <el-form-item label="发货人" prop="fshipper">
           <el-select v-model="form.fshipper" placeholder="请选择发货人">
@@ -74,6 +67,21 @@
             <el-option v-for="(item, index) in areaDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
+        <el-form-item label="业务员" prop="fsalesman">
+          <el-select v-model="form.fsalesman" placeholder="请选择业务员">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="作业区" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配送方式" prop="fdeliverymethod">
+          <el-select v-model="form.fdeliverymethod" placeholder="请选择配送方式">
+            <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="物流单号" prop="flogisticsnumber">
           <el-input v-model="form.flogisticsnumber" placeholder="请输入物流单号" />
         </el-form-item>
@@ -82,10 +90,8 @@
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
-        <el-form-item label="作业区" prop="fdistributionpoint">
-          <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
+        <el-form-item label="备注" prop="fmemo">
+          <el-input v-model="form.fmemo" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
     </div>
@@ -371,6 +377,15 @@ export default {
         this.driverList = response.rows
       })
     },
+    handleSelectFCode(val) {
+      let fname = this.supplierListCode.filter(item => item.fcode == val)[0].fname
+      console.log(JSON.stringify(fname))
+      this.form.fname = fname
+    },
+    handleSelectFName(val) {
+      console.log(JSON.stringify(val))
+      this.form.fcode = val
+    },
     getSupplierListByName(query) { // 通过name得模糊查询
       if(query=='') {
         this.supplierListName = []
@@ -624,6 +639,7 @@ export default {
       }
     },
     'form.fcode': function(newVal, oldVal) {
+      console.log(newVal + '<--->' + oldVal)
       if((newVal != null) && (newVal != oldVal)) {
           this.productListParams.fcode = newVal
           this.handleSearchEvent(this.productListParams)
