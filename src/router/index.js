@@ -128,7 +128,7 @@ export const constantRoutes = [
         path: '/purchase/order/detail',
         component: (resolve) => require(['@/views/purchase/order/detail'], resolve),
         hidden: true,
-        name: "OrderDetail"
+        name: "POrderDetail"
       },
       {
         path: '/purchase/stockin/detail',

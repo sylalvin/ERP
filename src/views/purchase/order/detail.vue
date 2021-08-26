@@ -133,6 +133,8 @@
       <el-table
         :data="form.yqPurchaseOrderDetailList"
         stripe
+        :summary-method="getSummaries"
+        show-summary
         :header-cell-style="headerStyle"
         height="100%">
         <el-table-column label="删除" fixed width="100" align="center">
@@ -238,7 +240,7 @@ import { listPrice } from "@/api/basic/supplierPrice";
 import Popup from "@/components/Popup";
 
 export default {
-  name: "OrderDetail",
+  name: "POrderDetail",
   data() {
     return {
       categoryList: [],
@@ -277,6 +279,18 @@ export default {
         keyid: [
           { required: true, message: "单据编号不能为空", trigger: "blur" }
         ],
+        createby: [
+          { required: true, message: "制单人不能为空", trigger: "blur" }
+        ],
+        fdistributionpoint: [
+          { required: true, message: "作业区不能为空", trigger: "blur" }
+        ],
+        fdeliverymethod: [
+          { required: true, message: "配送方式不能为空", trigger: "blur" }
+        ],
+        fcate: [
+          { required: true, message: "业务类型不能为空", trigger: "blur" }
+        ],
       },
       supplierListName: [],
       supplierListCode: [],
@@ -296,6 +310,7 @@ export default {
   },
   created() {
     this.keyid = this.$route.query.keyid
+    // this.keyid = this.$route.params.keyid
     if(this.keyid) {
       this.$route.meta.title = this.title = '编辑采购订单'
       this.getOrderDetail(this.keyid)
@@ -313,6 +328,7 @@ export default {
         prefix: 'TM'
       }).then(response => {
         this.reset()
+        this.form.createby = this.$store.state.user.name
         this.form.keyid = response.data
       })
     },
@@ -322,6 +338,9 @@ export default {
         this.loading = false
         this.reset()
         Object.assign(this.form, response.data)
+        if(!this.form.createby) {
+          this.form.createby = this.$store.state.user.name
+        }
       }, error => {
         this.loading = false
       })
@@ -335,7 +354,6 @@ export default {
         fsparent: 1007
       }).then(response => {
         this.billDictList = response.rows
-        // this.getList() // 先获取单据状态，根据单据状态渲染列表
       })
       // 获取配送方式
       listItem({
@@ -353,14 +371,6 @@ export default {
       }).then(response => {
         this.areaDictList = response.rows
       })
-      // // 获取业务类型
-      // listItem({
-      //   pageNum: 1,
-      //   pageSize: 20,
-      //   fsparent: 1007
-      // }).then(response => {
-      // this.businessDictList = response.rows
-      // })
       // 获取作业区
       listItem({
         pageNum: 1,
@@ -611,6 +621,30 @@ export default {
     },
     headerStyle() {
       return "text-align: center;border: 1px solid #ccc;"
+    },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计';
+          return;
+        }
+        if (index === 6 || index === 7) {
+          const values = data.map(item => Number(item[column.property]));
+          if (!values.every(value => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0);
+          }
+        }
+      });
+      return sums;
     }
   },
   computed: {
@@ -623,6 +657,7 @@ export default {
       handler: function(val){
         if(val.path != '/purchase/order/detail') return
         this.keyid = this.$route.query.keyid
+        // this.keyid = this.$route.params.keyid
         if(this.keyid) {
           this.$route.meta.title = this.title = '编辑采购订单'
           this.getOrderDetail(this.keyid);
@@ -714,5 +749,9 @@ export default {
   .activeBorder {
     border: #ff5722 solid 0.5px;
     border-radius: 5%;
+  }
+  .bottom-form >>> .el-table__footer-wrapper .cell,
+  .bottom-form >>> .el-table__fixed .cell {
+    color: red !important;
   }
 </style>

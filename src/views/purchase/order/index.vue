@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" class="search-form">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" class="search-form">
       <el-form-item label="开始日期"  prop="beginDate">
           <el-date-picker clearable size="small"
             v-model="queryParams.beginDate"
@@ -158,7 +158,7 @@
 </template>
 
 <script>
-import { listOrder, delOrder, addOrder, updateOrder, exportOrder } from "@/api/purchase/order";
+import { listOrder, delOrder, exportOrder } from "@/api/purchase/order";
 import { listSupplier } from "@/api/basic/supplier";
 import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
@@ -179,8 +179,6 @@ export default {
       single: true,
       // 非多个禁用
       multiple: true,
-      // 显示搜索条件
-      showSearch: true,
       // 总条数
       total: 0,
       // 采购表格数据
@@ -250,7 +248,7 @@ export default {
     },
     /** 查询字典，初始化页面数据 */
     getDictList() {
-      // 获取单据状态
+      // 获取业务单据状态
       listItem({
         pageNum: 1,
         pageSize: 20,
@@ -275,14 +273,6 @@ export default {
       }).then(response => {
         this.areaDictList = response.rows
       })
-      // // 获取业务类型
-      // listItem({
-      //   pageNum: 1,
-      //   pageSize: 20,
-      //   fsparent: 1007
-      // }).then(response => {
-      // this.businessDictList = response.rows
-      // })
       // 获取作业区
       listItem({
         pageNum: 1,
@@ -338,11 +328,14 @@ export default {
     handleUpdate(row) {
       const keyid = row.keyid || this.ids
       const route = {
-        name: "OrderDetail",
+        name: "POrderDetail",
         path: "/purchase/order/detail",
         query: {
           keyid: keyid
-        }
+        },
+        // params: {
+        //   keyid: keyid
+        // }
       }
       Object.assign(route, {
         meta: { title: '编辑采购订单' }
@@ -352,7 +345,7 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       const route = {
-        name: "OrderDetail",
+        name: "POrderDetail",
         path: "/purchase/order/detail"
       }
       Object.assign(route, {
