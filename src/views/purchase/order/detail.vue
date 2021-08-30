@@ -379,11 +379,11 @@ export default {
       }).then(response => {
         this.operationDictList = response.rows
       })
+      // 获取司机押运员发货人业务员
       listUser({
         pageNum: 1,
         pageSize: 100
       }).then(response => {
-        // console.log('User=====' + JSON.stringify(response.rows))
         this.driverList = response.rows
       })
     },
@@ -419,48 +419,31 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false;
-      this.reset();
     },
     // 表单重置
     reset() {
       this.form = {
         keyid: null,
-        fcompanyid: null,
         createby: null,
         fdate: null,
+        freconciliation: null,
         fcode: null,
         fname: null,
         faddress: null,
         fphone: null,
         flinkman: null,
+        ffreight: null,
         fvehiclenum: null,
-        fdeliverymethod: null,
         fdriver: null,
         fsupercargo: null,
-        fsalesman: null,
-        fmemo: null,
-        fflag: null,
-        fupdateby: null,
-        fupdatedate: null,
-        ftype: null,
-        ffreight: null,
-        famount: null,
         fshipper: null,
-        fprogress: null,
-        fstatus: null,
-        fauditor: null,
-        fauditflag: null,
         farea: null,
-        flogisticsnumber: null,
-        fdeleteflag: null,
-        fcate: null,
-        fdispatchnum: null,
-        foutflag: null,
+        fsalesman: null,
         fdistributionpoint: null,
-        forgid: null,
-        forgname: null,
-        fbill: null,
-        fpoint: null,
+        fdeliverymethod: null,
+        flogisticsnumber: null,
+        fcate: null,
+        fmemo: null,
         yqPurchaseOrderDetailList: []
       };
       this.resetForm("form");
@@ -469,19 +452,18 @@ export default {
     handleUpdate(row) {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.keyid != null) { // 更新逻辑
+          if (this.$route.query.keyid != null) { // 更新逻辑
             updateOrder(this.form).then(response => {
-              this.msgSuccess("保存成功");
+              this.msgSuccess(response.msg);
               this.open = false;
-              // this.getList();
             });
           } else { // 新增逻辑
             addOrder(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.msgSuccess(response.msg);
               this.open = false;
-              // this.getList();
             });
           }
+          this.handleClose()
         }
       });
     },
@@ -525,24 +507,22 @@ export default {
       this.popupLoading = true
       queryParams.fcode = this.form.fcode
       this.productListParams = queryParams
-      // console.log('search========' + JSON.stringify(queryParams))
       // 根据条件查询商品
       listPrice(
         queryParams
       ).then(response => {
         // 数据处理
         this.popupLoading = false
-        // console.log(JSON.stringify(response))
         this.requestData.total = response.total
         this.requestData.rows = response.rows
       })
     },
     handleConfirmEvent(data) {
       // 选择完成后，新增到产品列表
-      console.log(JSON.stringify(this.form.yqPurchaseOrderDetailList))
       if(data.length >0) {
+        // 应先进行数据去重，判断商品是否已存在列表中
+        // code...
         for(let val of data) {
-          console.log(JSON.stringify(val))
           let temp = {}
           temp.createTime = val.createTime
           temp. updateTime = val.updateTime
@@ -598,26 +578,6 @@ export default {
     },
     handleBlur() {
       this.activeText = ''
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.keyid != null) {
-            updateOrder(this.form).then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            addOrder(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
-          }
-        }
-      });
     },
     headerStyle() {
       return "text-align: center;border: 1px solid #ccc;"
