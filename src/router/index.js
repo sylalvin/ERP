@@ -176,6 +176,25 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/business',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/business/lossess/edit',
+        component: (resolve) => require(['@/views/business/lossess/Edit'], resolve),
+        hidden: true,
+        name: "LossessEdit"
+      },
+      {
+        path: '/business/lossess/detail',
+        component: (resolve) => require(['@/views/business/lossess/Detail'], resolve),
+        hidden: true,
+        name: "LossessDetail"
+      }
+    ]
+  },
+  {
     path: '/gen',
     component: Layout,
     hidden: true,
