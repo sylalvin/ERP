@@ -1,4 +1,4 @@
-<!-- 入仓单详情 -->
+<!-- 回收气瓶详情 -->
 <template>
   <div class="app-container">
     <div class="middle-form">
@@ -111,7 +111,7 @@
 import { getStockin } from "@/api/purchase/stockin";
 
 export default {
-  name: "StockInDetail",
+  name: "BottleReturnDetail",
   data() {
     return {
       // 遮罩层
@@ -125,16 +125,16 @@ export default {
   created() {
     this.keyid = this.$route.query.keyid
     if(this.keyid) {
-      this.$route.meta.title = this.title = '入仓单详情'
+      this.$route.meta.title = this.title = '回收气瓶详情'
       this.getStockinDetail(this.keyid)
-      // this.$message.success('获取入仓单单据号成功');
+      // this.$message.success('获取回收气瓶单据号成功');
     }else {
-      // 获取入仓单失败
-      this.$message.error('获取入仓单单据号失败');
+      // 获取回收气瓶失败
+      this.$message.error('获取回收气瓶单据号失败');
     }
   },
   methods: {
-    /** 查询入仓单详情 */
+    /** 查询回收气瓶详情 */
     getStockinDetail(keyid) {
       getStockin(keyid).then(response => {
         this.loading = false
@@ -216,10 +216,10 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/business/stockIn/detail') return
+        if(val.path != '/business/bottleReturn/detail') return
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '入仓单详情'
+          this.$route.meta.title = this.title = '回收气瓶详情'
           this.getStockinDetail(this.keyid);
         }
         const visitedViews = this.$store.state.tagsView.visitedViews

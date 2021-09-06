@@ -1,4 +1,4 @@
-<!-- 添加或修改入仓单 -->
+<!-- 添加或修改气瓶出库 -->
 <template>
   <div class="app-container">
     <div class="top-form">

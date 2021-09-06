@@ -1,4 +1,4 @@
-<!-- 入仓单详情 -->
+<!-- 气瓶出库详情 -->
 <template>
   <div class="app-container">
     <div class="middle-form">
