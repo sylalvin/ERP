@@ -289,6 +289,7 @@ export default {
     /** 查看详情操作 */
     handleCheck(row) {
       const keyid = row.keyid || this.ids
+      console.log(keyid)
       const route = {
         name: "LossessDetail",
         path: "/business/lossess/detail",

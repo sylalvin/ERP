@@ -1,7 +1,7 @@
+<!-- 添加或修改入仓单 -->
 <template>
   <div class="app-container">
     <div class="top-form">
-      <!-- 添加或修改盘盈单 -->
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="单据编号" prop="keyid">
           <el-input v-model="form.keyid" disabled />
@@ -17,8 +17,31 @@
             placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="盘盈类型" prop="fvehiclenum">
-          <el-select v-model="form.fvehiclenum" placeholder="请选择盘盈类型">
+        <el-form-item label="入仓类型" prop="fvehiclenum">
+          <el-select v-model="form.fvehiclenum" placeholder="请选择入仓类型">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="收发类型" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择收发类型">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="仓库" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择仓库">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="业务员" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择业务员">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注" prop="fmemo">
+          <el-input v-model="form.fmemo" placeholder="请输入备注" />
+        </el-form-item>
+        <el-form-item label="班组" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择班组">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
@@ -26,9 +49,6 @@
           <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="fmemo">
-          <el-input v-model="form.fmemo" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
     </div>
@@ -110,19 +130,6 @@
           label="单位">
         </el-table-column>
         <el-table-column
-          prop="fprice"
-          label="单价">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fprice')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fprice')"
-              @blur="handleBlur"
-              v-model="scope.row.fprice" />
-          </template>
-        </el-table-column>
-        <el-table-column
           prop="fqty"
           label="数量">
           <template v-slot="scope">
@@ -133,20 +140,6 @@
               @focus="handleFocus(scope.row.fid + '-' + 'fqty')"
               @blur="handleBlur"
               v-model="scope.row.fqty" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="famount"
-          label="金额">
-          <template v-slot="scope">
-            <el-input
-              disabled
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'famount')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'famount')"
-              @blur="handleBlur"
-              v-model="scope.row.famount" />
           </template>
         </el-table-column>
         <el-table-column
@@ -188,21 +181,13 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="funit"
-          label="已提瓶">
-        </el-table-column>
-        <el-table-column
           prop="fcate"
           label="类型">
-        </el-table-column>
-        <el-table-column
-          prop="funit"
-          label="存货代码">
         </el-table-column>
       </el-table>
     </div>
 
-    <!-- 添加或修改盘盈单对话框 -->
+    <!-- 添加或修改入仓单商品对话框 -->
     <el-dialog :visible.sync="open" title="商品档案">
       <div slot="title" class="dialog-title">
         <i class="el-icon-menu"></i>
@@ -224,7 +209,7 @@ import { listPrice } from "@/api/basic/supplierPrice";
 import Popup from "@/components/Popup";
 
 export default {
-  name: "ProfitEdit",
+  name: "StockInEdit",
   data() {
     return {
       categoryList: [],
@@ -263,10 +248,10 @@ export default {
     this.keyid = this.$route.query.keyid
     // this.keyid = this.$route.params.keyid
     if(this.keyid) {
-      this.$route.meta.title = this.title = '编辑盘盈单'
+      this.$route.meta.title = this.title = '编辑入仓单'
       this.getOrderDetail(this.keyid)
     }else {
-      this.$route.meta.title = this.title = '添加盘盈单'
+      this.$route.meta.title = this.title = '添加入仓单'
       this.getBillNumber();
     }
     this.getDictList();
@@ -283,7 +268,7 @@ export default {
         this.form.keyid = response.data
       })
     },
-    /** 查询采购订单详情 */
+    /** 查询入仓单详情 */
     getOrderDetail(keyid) {
       getOrder(keyid).then(response => {
         this.loading = false
@@ -495,14 +480,14 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/business/profit/edit') return
+        if(val.path != '/business/stockIn/edit') return
         this.keyid = this.$route.query.keyid
         // this.keyid = this.$route.params.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '编辑盘盈单'
+          this.$route.meta.title = this.title = '编辑入仓单'
           this.getOrderDetail(this.keyid);
         }else {
-          this.$route.meta.title = this.title = '添加盘盈单'
+          this.$route.meta.title = this.title = '添加入仓单'
           this.getBillNumber();
         }
         const visitedViews = this.$store.state.tagsView.visitedViews

@@ -191,6 +191,42 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/business/lossess/Detail'], resolve),
         hidden: true,
         name: "LossessDetail"
+      },
+      {
+        path: '/business/profit/edit',
+        component: (resolve) => require(['@/views/business/profit/Edit'], resolve),
+        hidden: true,
+        name: "ProfitEdit"
+      },
+      {
+        path: '/business/profit/detail',
+        component: (resolve) => require(['@/views/business/profit/Detail'], resolve),
+        hidden: true,
+        name: "ProfitDetail"
+      },
+      {
+        path: '/business/stockIn/edit',
+        component: (resolve) => require(['@/views/business/stockIn/Edit'], resolve),
+        hidden: true,
+        name: "StockInEdit"
+      },
+      {
+        path: '/business/stockIn/detail',
+        component: (resolve) => require(['@/views/business/stockIn/Detail'], resolve),
+        hidden: true,
+        name: "StockInDetail"
+      },
+      {
+        path: '/business/stockOut/edit',
+        component: (resolve) => require(['@/views/business/stockOut/Edit'], resolve),
+        hidden: true,
+        name: "StockOutEdit"
+      },
+      {
+        path: '/business/stockOut/detail',
+        component: (resolve) => require(['@/views/business/stockOut/Detail'], resolve),
+        hidden: true,
+        name: "StockOutDetail"
       }
     ]
   },

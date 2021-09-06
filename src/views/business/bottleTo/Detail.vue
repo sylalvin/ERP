@@ -1,3 +1,4 @@
+<!-- 入仓单详情 -->
 <template>
   <div class="app-container">
     <div class="middle-form">
@@ -25,7 +26,6 @@
     </div>
 
     <div class="top-form">
-      <!-- 盘盈单详情表单 -->
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="单据编号：" prop="keyid">
           <el-tooltip :content="form.keyid">
@@ -37,6 +37,9 @@
         </el-form-item>
         <el-form-item label="日期：" prop="fdate">
             <span>{{ form.fdate }}</span>
+        </el-form-item>
+        <el-form-item label="入仓类型：" prop="fcate">
+            <span>{{ form.fcate }}</span>
         </el-form-item>
         <el-form-item label="备注：" prop="fmemo">
             <span>{{ form.fmemo }}</span>
@@ -71,16 +74,8 @@
               label="单位">
             </el-table-column>
             <el-table-column
-              prop="funit"
-              label="单价">
-            </el-table-column>
-            <el-table-column
               prop="fqty"
               label="数量">
-            </el-table-column>
-            <el-table-column
-              prop="famount"
-              label="金额">
             </el-table-column>
             <el-table-column
               prop="fbottle"
@@ -91,7 +86,7 @@
               label="气瓶数量">
             </el-table-column>
             <el-table-column
-              prop="remark"
+              prop="fmemo"
               label="备注说明">
             </el-table-column>
             <el-table-column
@@ -99,7 +94,7 @@
               label="已提瓶">
             </el-table-column>
             <el-table-column
-              prop="fcateid"
+              prop="fcate"
               label="类型">
             </el-table-column>
           </el-table>
@@ -116,7 +111,7 @@
 import { getStockin } from "@/api/purchase/stockin";
 
 export default {
-  name: "ProfitDetail",
+  name: "StockInDetail",
   data() {
     return {
       // 遮罩层
@@ -130,16 +125,16 @@ export default {
   created() {
     this.keyid = this.$route.query.keyid
     if(this.keyid) {
-      this.$route.meta.title = this.title = '盘盈单详情'
+      this.$route.meta.title = this.title = '入仓单详情'
       this.getStockinDetail(this.keyid)
-      // this.$message.success('获取盘盈单单据号成功');
+      // this.$message.success('获取入仓单单据号成功');
     }else {
-      // 获取盘盈单失败
-      this.$message.error('获取盘盈单单据号失败');
+      // 获取入仓单失败
+      this.$message.error('获取入仓单单据号失败');
     }
   },
   methods: {
-    /** 查询采购订单详情 */
+    /** 查询入仓单详情 */
     getStockinDetail(keyid) {
       getStockin(keyid).then(response => {
         this.loading = false
@@ -158,6 +153,7 @@ export default {
         createby: null,
         fdate: null,
         fmemo: null,
+        fcate: null,
         stockinDetailsList: [],
       };
       this.resetForm("form");
@@ -220,10 +216,10 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/business/profit/detail') return
+        if(val.path != '/business/stockIn/detail') return
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '盘盈单详情'
+          this.$route.meta.title = this.title = '入仓单详情'
           this.getStockinDetail(this.keyid);
         }
         const visitedViews = this.$store.state.tagsView.visitedViews

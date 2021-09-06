@@ -99,7 +99,7 @@
         </el-table-column>
         <el-table-column
           prop="fitemname"
-          label="品名">
+          label="名称">
         </el-table-column>
         <el-table-column
           prop="fspec"
@@ -150,17 +150,54 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="remark"
+          prop="fbottlename"
+          label="包装物">
+          <template v-slot="scope">
+            <el-input
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottlename')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottlename')"
+              @blur="handleBlur"
+              v-model="scope.row.fbottlename" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fbottleqty"
+          label="气瓶数量">
+          <template v-slot="scope">
+            <el-input
+              type="number"
+              class="product"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleqty')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fbottleqty')"
+              @blur="handleBlur"
+              v-model="scope.row.fbottleqty" />
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fmemo"
           label="备注说明">
           <template v-slot="scope">
             <el-input
               type="text"
               class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'remark')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'remark')"
+              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fmemo')}"
+              @focus="handleFocus(scope.row.fid + '-' + 'fmemo')"
               @blur="handleBlur"
-              v-model="scope.row.remark" />
+              v-model="scope.row.fmemo" />
           </template>
+        </el-table-column>
+        <el-table-column
+          prop="funit"
+          label="已提瓶">
+        </el-table-column>
+        <el-table-column
+          prop="fcate"
+          label="类型">
+        </el-table-column>
+        <el-table-column
+          prop="funit"
+          label="存货代码">
         </el-table-column>
       </el-table>
     </div>
