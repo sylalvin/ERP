@@ -227,6 +227,30 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/business/stockOut/Detail'], resolve),
         hidden: true,
         name: "StockOutDetail"
+      },
+      {
+        path: '/business/bottleReturn/edit',
+        component: (resolve) => require(['@/views/business/bottleReturn/Edit'], resolve),
+        hidden: true,
+        name: "BottleReturnEdit"
+      },
+      {
+        path: '/business/bottleReturn/detail',
+        component: (resolve) => require(['@/views/business/bottleReturn/Detail'], resolve),
+        hidden: true,
+        name: "BottleReturnDetail"
+      },
+      {
+        path: '/business/bottleTo/edit',
+        component: (resolve) => require(['@/views/business/bottleTo/Edit'], resolve),
+        hidden: true,
+        name: "BottleToEdit"
+      },
+      {
+        path: '/business/bottleTo/detail',
+        component: (resolve) => require(['@/views/business/bottleTo/Detail'], resolve),
+        hidden: true,
+        name: "BottleToDetail"
       }
     ]
   },

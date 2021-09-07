@@ -193,31 +193,6 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="fbottlename"
-          label="包装物">
-          <template v-slot="scope">
-            <el-input
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottlename')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fbottlename')"
-              @blur="handleBlur"
-              v-model="scope.row.fbottlename" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="fbottleqty"
-          label="气瓶数量">
-          <template v-slot="scope">
-            <el-input
-              type="number"
-              class="product"
-              :class="{activeBorder: activeText == (scope.row.fid + '-' + 'fbottleqty')}"
-              @focus="handleFocus(scope.row.fid + '-' + 'fbottleqty')"
-              @blur="handleBlur"
-              v-model="scope.row.fbottleqty" />
-          </template>
-        </el-table-column>
-        <el-table-column
           prop="fmemo"
           label="备注说明">
           <template v-slot="scope">
@@ -230,14 +205,10 @@
               v-model="scope.row.fmemo" />
           </template>
         </el-table-column>
-        <el-table-column
-          prop="fcate"
-          label="类型">
-        </el-table-column>
       </el-table>
     </div>
 
-    <!-- 添加或修改入仓单商品对话框 -->
+    <!-- 添加或修改商品对话框 -->
     <el-dialog :visible.sync="open" title="商品档案">
       <div slot="title" class="dialog-title">
         <i class="el-icon-menu"></i>
@@ -259,7 +230,7 @@ import { listPrice } from "@/api/basic/supplierPrice";
 import Popup from "@/components/Popup";
 
 export default {
-  name: "StockInEdit",
+  name: "BottleReturnEdit",
   data() {
     return {
       categoryList: [],
@@ -324,12 +295,11 @@ export default {
   },
   created() {
     this.keyid = this.$route.query.keyid
-    // this.keyid = this.$route.params.keyid
     if(this.keyid) {
-      this.$route.meta.title = this.title = '编辑入仓单'
+      this.$route.meta.title = this.title = '编辑空瓶回收单'
       this.getOrderDetail(this.keyid)
     }else {
-      this.$route.meta.title = this.title = '添加入仓单'
+      this.$route.meta.title = this.title = '添加空瓶回收单'
       this.getBillNumber();
     }
     this.getDictList();
@@ -346,7 +316,7 @@ export default {
         this.form.keyid = response.data
       })
     },
-    /** 查询入仓单详情 */
+    /** 查询空瓶回收单详情 */
     getOrderDetail(keyid) {
       getOrder(keyid).then(response => {
         this.loading = false
@@ -585,10 +555,10 @@ export default {
         this.keyid = this.$route.query.keyid
         // this.keyid = this.$route.params.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '编辑回收气瓶'
+          this.$route.meta.title = this.title = '编辑空瓶回收单'
           this.getOrderDetail(this.keyid);
         }else {
-          this.$route.meta.title = this.title = '添加回收气瓶'
+          this.$route.meta.title = this.title = '添加空瓶回收单'
           this.getBillNumber();
         }
         const visitedViews = this.$store.state.tagsView.visitedViews

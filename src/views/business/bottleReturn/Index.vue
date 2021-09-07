@@ -98,17 +98,6 @@
         <el-button
           type="primary"
           plain
-          icon="el-icon-upload"
-          size="mini"
-          :disabled="ids.length == 0"
-          @click="handleUpload"
-          v-hasPermi="['purchase:order:upload']"
-        >上传</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
           icon="el-icon-circle-check"
           size="mini"
           :disabled="ids.length == 0"
@@ -329,10 +318,6 @@ export default {
         meta: { title: '气瓶回收详情' }
       })
       this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
-    },
-    /** 上传按钮操作 */
-    handleUpload() {
-      console.log("上传")
     },
     /** 审核按钮操作 */
     handleAudit() {

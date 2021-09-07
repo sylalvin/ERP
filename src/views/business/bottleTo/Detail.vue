@@ -38,11 +38,41 @@
         <el-form-item label="日期：" prop="fdate">
             <span>{{ form.fdate }}</span>
         </el-form-item>
-        <el-form-item label="入仓类型：" prop="fcate">
-            <span>{{ form.fcate }}</span>
+        <el-form-item label="客户名称：" prop="fname">
+            <span>{{ form.fname }}</span>
+        </el-form-item>
+        <el-form-item label="客户地址：" prop="faddress">
+            <span>{{ form.faddress }}</span>
+        </el-form-item>
+        <el-form-item label="电话：" prop="fphone">
+            <span>{{ form.fphone }}</span>
+        </el-form-item>
+        <el-form-item label="联系人：" prop="flinkman">
+            <span>{{ form.flinkman }}</span>
+        </el-form-item>
+        <el-form-item label="运输服务费：" prop="ffreight">
+            <span>{{ form.ffreight }}</span>
+        </el-form-item>
+        <el-form-item label="车牌号：" prop="fvehiclenum">
+            <span>{{ form.fvehiclenum }}</span>
+        </el-form-item>
+        <el-form-item label="送货司机：" prop="fdriver">
+            <span>{{ form.fdriver }}</span>
+        </el-form-item>
+        <el-form-item label="押运员：" prop="fsupercargo">
+            <span>{{ form.fsupercargo }}</span>
+        </el-form-item>
+        <el-form-item label="发货人：" prop="fshipper">
+            <span>{{ form.fshipper }}</span>
         </el-form-item>
         <el-form-item label="备注：" prop="fmemo">
             <span>{{ form.fmemo }}</span>
+        </el-form-item>
+        <el-form-item label="目前欠款：" prop="aramt">
+            <span>{{ form.aramt }}</span>
+        </el-form-item>
+        <el-form-item label="目前欠瓶：" prop="arbottle">
+            <span>{{ form.arbottle }}</span>
         </el-form-item>
       </el-form>
     </div>
@@ -78,24 +108,8 @@
               label="数量">
             </el-table-column>
             <el-table-column
-              prop="fbottle"
-              label="包装物">
-            </el-table-column>
-            <el-table-column
-              prop="fbottle"
-              label="气瓶数量">
-            </el-table-column>
-            <el-table-column
               prop="fmemo"
               label="备注说明">
-            </el-table-column>
-            <el-table-column
-              prop="remark"
-              label="已提瓶">
-            </el-table-column>
-            <el-table-column
-              prop="fcate"
-              label="类型">
             </el-table-column>
           </el-table>
         </el-tab-pane>
@@ -111,7 +125,7 @@
 import { getStockin } from "@/api/purchase/stockin";
 
 export default {
-  name: "StockInDetail",
+  name: "BottleToDetail",
   data() {
     return {
       // 遮罩层
@@ -125,38 +139,25 @@ export default {
   created() {
     this.keyid = this.$route.query.keyid
     if(this.keyid) {
-      this.$route.meta.title = this.title = '入仓单详情'
+      this.$route.meta.title = this.title = '空瓶出库详情'
       this.getStockinDetail(this.keyid)
-      // this.$message.success('获取入仓单单据号成功');
+      // this.$message.success('获取空瓶出库单据号成功');
     }else {
-      // 获取入仓单失败
-      this.$message.error('获取入仓单单据号失败');
+      // 获取空瓶出库失败
+      this.$message.error('获取空瓶出库单据号失败');
     }
   },
   methods: {
-    /** 查询入仓单详情 */
+    /** 查询空瓶出库详情 */
     getStockinDetail(keyid) {
       getStockin(keyid).then(response => {
         this.loading = false
-        this.reset()
         Object.assign(this.form, response.data)
       }, error => {
         this.loading = false
-        this.reset()
+        this.form = null
         this.form.keyid = this.keyid
       })
-    },
-    // 表单重置
-    reset() {
-      this.form = {
-        keyid: null,
-        createby: null,
-        fdate: null,
-        fmemo: null,
-        fcate: null,
-        stockinDetailsList: [],
-      };
-      this.resetForm("form");
     },
     /** 打印按钮操作 */
     handleUpdate(row) {
@@ -216,10 +217,10 @@ export default {
   watch: {
     $route: {
       handler: function(val){
-        if(val.path != '/business/stockIn/detail') return
+        if(val.path != '/business/bottleTo/detail') return
         this.keyid = this.$route.query.keyid
         if(this.keyid) {
-          this.$route.meta.title = this.title = '入仓单详情'
+          this.$route.meta.title = this.title = '空瓶出库详情'
           this.getStockinDetail(this.keyid);
         }
         const visitedViews = this.$store.state.tagsView.visitedViews

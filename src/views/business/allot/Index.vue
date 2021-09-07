@@ -1,4 +1,4 @@
-<!-- 入仓单 -->
+<!-- 调拨单 -->
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" class="search-form">
@@ -18,6 +18,29 @@
             placeholder="选择结束日期">
           </el-date-picker>
       </el-form-item>
+      <el-form-item label="业务状态" prop="fstatus">
+        <el-select v-model="queryParams.fstatus" placeholder="请选择业务状态" size="small">
+          <el-option v-for="(item, index) in fstatusList" :key="index" :label="item.fkey" :value="item.fvalue" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="客户名称" prop="fname">
+        <el-input
+          v-model="queryParams.fname"
+          placeholder="请输入客户名称"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="客户代码" prop="fcode">
+        <el-input
+          v-model="queryParams.fitemname"
+          placeholder="请输入客户代码"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="单据编号" prop="keyid">
         <el-input
           v-model="queryParams.keyid"
@@ -26,20 +49,6 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="操作员" prop="fname">
-        <el-input
-          v-model="queryParams.fname"
-          placeholder="请输入操作员"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="业务状态" prop="fstatus">
-        <el-select v-model="queryParams.fstatus" placeholder="请选择业务状态" size="small">
-          <el-option v-for="(item, index) in fstatusList" :key="index" :label="item.fkey" :value="item.fvalue" />
-        </el-select>
       </el-form-item>
     </el-form>
 
@@ -78,17 +87,6 @@
         <el-button
           type="primary"
           plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="ids.length == 0"
-          @click="handleDelete"
-          v-hasPermi="['purchase:order:remove']"
-        >作废</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
           icon="el-icon-upload"
           size="mini"
           :disabled="ids.length == 0"
@@ -100,12 +98,12 @@
         <el-button
           type="primary"
           plain
-          icon="el-icon-circle-check"
+          icon="el-icon-delete"
           size="mini"
           :disabled="ids.length == 0"
-          @click="handleAudit"
-          v-hasPermi="['purchase:order:audit']"
-        >审核</el-button>
+          @click="handleDelete"
+          v-hasPermi="['purchase:order:remove']"
+        >作废</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -151,18 +149,21 @@
       <el-table-column label="作废标识" align="center" prop="fflag" />
       <el-table-column label="单据状态" align="center" prop="fstatus" />
       <el-table-column label="上传" align="center" prop="ft6status" />
-      <el-table-column label="班组" align="center" prop="createby" />
-      <el-table-column label="作业区" align="center" prop="fdistributionpoint" />
-      <el-table-column label="领用部门" align="center" prop="createby" />
-      <el-table-column label="领用人" align="center" prop="createby" />
-      <el-table-column label="日期" align="center" prop="fdate" width="180">
+      <el-table-column label="调拨站点" align="center" prop="fdistributionpoint" />
+      <el-table-column label="接收站点" align="center" prop="fpoint" />
+      <el-table-column label="配送日期" align="center" prop="fdate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.fdate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="入仓库类型" align="center" prop="fcate" />
-      <el-table-column label="操作员" align="center" prop="fname" />
-      <el-table-column label="备注" align="center" prop="fmemo" />
+      <el-table-column label="客户代码" align="center" prop="fcode" />
+      <el-table-column label="客户名称" align="center" prop="fname" />
+      <el-table-column label="配送方式" align="center" prop="deliverymethod" />
+      <el-table-column label="车牌号" align="center" prop="fvehiclenum" />
+      <el-table-column label="送货司机" align="center" prop="fdriver" />
+      <el-table-column label="押运员" align="center" prop="fsupercargo" />
+      <el-table-column label="发货人" align="center" prop="fshipper" />
+      <el-table-column label="操作员" align="center" prop="fsalesman" />
       <el-table-column label="操作时间" align="center" prop="fupdatedate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.fupdatedate, '{y}-{m}-{d}') }}</span>
@@ -188,7 +189,7 @@ import { listItem } from "@/api/system/businessDictItem";
 import { listUser } from "@/api/system/user";
 
 export default {
-  name: "StockInIndex",
+  name: "AllotIndex",
   components: {
   },
   data() {
@@ -215,7 +216,8 @@ export default {
         fstatus: null,
         beginDate: null,
         endDate: null,
-        fname: null
+        fname: null,
+        fcode: null
       },
       fstatusList: [] // 单据状态
     };
@@ -229,7 +231,7 @@ export default {
     this.getDictList();
   },
   methods: {
-    /** 查询采购列表 */
+    /** 查询调拨单列表 */
     getList() {
       this.loading = true;
       listOrder(this.queryParams).then(response => {
@@ -280,25 +282,25 @@ export default {
     handleUpdate(row) {
       const keyid = row.keyid || this.ids
       const route = {
-        name: "StockInEdit",
-        path: "/business/stockIn/edit",
+        name: "AllotEdit",
+        path: "/business/allot/edit",
         query: {
           keyid: keyid
         },
       }
       Object.assign(route, {
-        meta: { title: '编辑入仓单' }
+        meta: { title: '编辑调拨单' }
       })
       this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
     },
     /** 新增按钮操作 */
     handleAdd() {
       const route = {
-        name: "StockInEdit",
-        path: "/business/stockIn/edit",
+        name: "AllotEdit",
+        path: "/business/allot/edit",
       }
       Object.assign(route, {
-        meta: { title: '增加入仓单' }
+        meta: { title: '增加调拨单' }
       })
       this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
     },
@@ -307,14 +309,14 @@ export default {
       const keyid = row.keyid || this.ids
       console.log(keyid)
       const route = {
-        name: "StockInEdit",
-        path: "/business/stockIn/detail",
+        name: "AllotDetail",
+        path: "/business/allot/detail",
         query: {
           keyid: keyid
         },
       }
       Object.assign(route, {
-        meta: { title: '入仓单详情' }
+        meta: { title: '调拨单详情' }
       })
       this.$store.dispatch('tagsView/addView', route).then(this.$router.push(route))
     },
@@ -351,7 +353,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const keyids = row.keyid || this.ids;
-      this.$confirm('是否确认删除采购编号为"' + keyids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除单据编号为"' + keyids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -365,7 +367,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有采购数据项?', "警告", {
+      this.$confirm('是否确认导出所有调拨单数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
