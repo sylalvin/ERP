@@ -32,15 +32,6 @@
           <el-option v-for="(item, index) in supplierListName" :key="index" :label="item.fname" :value="item.fcode" />
           </el-select>
         </el-form-item>
-        <el-form-item label="电话" prop="fphone">
-          <el-input v-model="form.fphone" placeholder="请输入电话" />
-        </el-form-item>
-        <el-form-item label="联系人" prop="flinkman">
-          <el-input v-model="form.fphone" placeholder="请输入联系人" />
-        </el-form-item>
-        <el-form-item label="运输服务费" prop="ffreight">
-          <el-input v-model="form.fphone" placeholder="0.00" disabled />
-        </el-form-item>
         <el-form-item label="车牌号" prop="fvehiclenum">
           <el-select v-model="form.fvehiclenum" placeholder="请选择车牌号">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
@@ -61,18 +52,8 @@
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
-        <el-form-item label="区域" prop="farea">
-          <el-select v-model="form.farea" placeholder="请选择区域">
-            <el-option v-for="(item, index) in areaDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="业务员" prop="fsalesman">
           <el-select v-model="form.fsalesman" placeholder="请选择业务员">
-            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="作业区" prop="fdistributionpoint">
-          <el-select v-model="form.fdistributionpoint" placeholder="请选择作业区">
             <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
@@ -81,8 +62,18 @@
             <el-option v-for="(item, index) in deliveryDictList" :key="index" :label="item.fvalue" :value="item.fid" />
           </el-select>
         </el-form-item>
-        <el-form-item label="物流单号" prop="flogisticsnumber">
-          <el-input v-model="form.flogisticsnumber" placeholder="请输入物流单号" />
+        <el-form-item label="发货站点" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择发货站点">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="接收站点" prop="fdistributionpoint">
+          <el-select v-model="form.fdistributionpoint" placeholder="请选择接收站点">
+            <el-option v-for="(item, index) in operationDictList" :key="index" :label="item.fvalue" :value="item.fid" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="收货人" prop="flinkman">
+          <el-input v-model="form.fphone" placeholder="请输入收货人" />
         </el-form-item>
         <el-form-item label="备注" prop="fmemo">
           <el-input v-model="form.fmemo" placeholder="请输入备注" />
@@ -262,6 +253,9 @@ export default {
         ],
         fdeliverymethod: [
           { required: true, message: "配送方式不能为空", trigger: "blur" }
+        ],
+        fdistributionpoint: [
+          { required: true, message: "发货站点和接收站点不能为空", trigger: "blur" }
         ]
       },
       supplierListName: [],
